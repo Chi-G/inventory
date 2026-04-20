@@ -12,7 +12,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        if (config('app.env') === 'production') {
+            $this->app->bind('path.public', function() {
+                return base_path();
+            });
+        }
     }
 
     /**
@@ -25,7 +29,10 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.env') === 'production') {
             \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
             \Illuminate\Support\Facades\URL::forceScheme('https');
+            
+            // Force Vite to look in the /inventory/build directory
             Vite::useAssetUrl(config('app.url'));
+            Vite::useBuildDirectory('build');
         }
     }
 }
