@@ -28,7 +28,7 @@ jobs:
       run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
     - name: Install JS Dependencies
-      run: npm install
+      run: npm install --legacy-peer-deps
 
     - name: Run Build
       run: npm run build
