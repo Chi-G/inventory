@@ -24,7 +24,7 @@ class UserController extends Controller
             'role' => ['required', Rule::in(['Super Admin', 'Admin', 'Manager', 'Staff'])],
         ]);
 
-        $validated['password'] = Hash::make('password123'); // Default password
+        $validated['password'] = Hash::make('password123');
 
         User::create($validated);
 

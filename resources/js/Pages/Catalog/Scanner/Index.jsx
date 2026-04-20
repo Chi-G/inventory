@@ -25,24 +25,52 @@ export default function Index() {
         type: 'IN',
         notes: '',
     });
+    const [scanMode, setScanMode] = useState('camera'); // 'camera' or 'machine'
+    const machineInputRef = useRef(null);
 
     useEffect(() => {
-        const scanner = new Html5QrcodeScanner('reader', {
-            fps: 10,
-            qrbox: { width: 250, height: 250 },
-            rememberLastUsedCamera: true,
-            supportedScanTypes: [0] // 0 = QR, 1 = Barcode, but html5-qrcode detects both by default if supported
-        });
+        let scanner = null;
+        if (scanMode === 'camera') {
+            scanner = new Html5QrcodeScanner('reader', {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                rememberLastUsedCamera: true,
+                supportedScanTypes: [0]
+            });
 
-        scanner.render(onScanSuccess, onScanFailure);
+            scanner.render(onScanSuccess, (err) => {
+                // Ignore standard "not found" errors which happen 30 times a second
+                if (err?.includes("NotFound")) return;
+                console.error("Scanner error:", err);
+            });
+        }
+
+        if (scanMode === 'machine') {
+            machineInputRef.current?.focus();
+        }
 
         return () => {
-            scanner.clear().catch(error => console.error("Failed to clear scanner. ", error));
+            if (scanner) {
+                scanner.clear().catch(error => console.error("Failed to clear scanner. ", error));
+            }
         };
-    }, []);
+    }, [scanMode]);
+
+    // Handle machine (keyboard) scan
+    const handleMachineScan = (e) => {
+        if (e.key === 'Enter') {
+            const barcode = e.target.value.trim();
+            if (barcode) {
+                setScannedResult(barcode);
+                playBeep();
+                lookupProduct(barcode);
+                e.target.value = '';
+            }
+        }
+    };
 
     const playBeep = () => {
-        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/766/766-preview.mp3'); // Standard beep URL
+        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/766/766-preview.mp3');
         audio.play().catch(e => console.log("Audio play blocked by browser."));
     };
 
@@ -56,6 +84,8 @@ export default function Index() {
 
     function onScanFailure(error) {
         // quiet fail
+        // now how will it fail? is there no code to be written here?
+        
     }
 
     const lookupProduct = async (barcode) => {
@@ -92,24 +122,63 @@ export default function Index() {
 
             <div className="max-w-4xl mx-auto">
                 <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden mb-8">
-                    <div className="p-8 bg-slate-900 text-white flex justify-between items-center">
+                    <div className="p-8 bg-slate-900 text-white flex justify-between items-center transition-colors">
                         <div>
-                            <h2 className="text-2xl font-bold flex items-center gap-2">
-                                <Scan className="w-6 h-6 text-indigo-400" />
-                                Barcode Scanner
+                            <h2 className="text-2xl font-bold flex items-center gap-2 text-indigo-400">
+                                <Scan className="w-6 h-6" />
+                                Interactive Scan Center
                             </h2>
-                            <p className="text-slate-400 mt-1">Point your camera at a product barcode or SKU label.</p>
+                            <p className="text-slate-400 mt-1">Select your scanning preference below.</p>
                         </div>
-                        <div className="hidden sm:block">
-                            <div className="h-12 w-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30">
-                                <Camera className="w-6 h-6 text-indigo-400 animate-pulse" />
-                            </div>
+                        <div className="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
+                            <button 
+                                onClick={() => setScanMode('camera')}
+                                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${scanMode === 'camera' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                            >
+                                <Camera className="w-3 h-3" />
+                                Camera
+                            </button>
+                            <button 
+                                onClick={() => setScanMode('machine')}
+                                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${scanMode === 'machine' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                            >
+                                <Scan className="w-3 h-3" />
+                                QR Machine
+                            </button>
                         </div>
                     </div>
 
                     <div className="p-8">
-                        <div id="reader" className="w-full rounded-2xl overflow-hidden border-2 border-dashed border-slate-200 bg-slate-50 min-h-[300px]"></div>
-                        
+                        {scanMode === 'camera' ? (
+                            <div className="animate-in fade-in zoom-in-95 duration-500">
+                                <div id="reader" className="w-full rounded-2xl overflow-hidden border-2 border-dashed border-slate-200 bg-slate-50 min-h-[300px]"></div>
+                                <div className="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-xl flex items-center gap-3 text-amber-700 text-xs font-medium">
+                                    <AlertCircle className="w-4 h-4" />
+                                    <span>If camera doesn't show, ensure you are on <strong>HTTPS</strong> and have granted permissions.</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="py-20 flex flex-col items-center justify-center border-2 border-dashed border-indigo-200 bg-indigo-50/30 rounded-2xl animate-in slide-in-from-bottom-4 duration-500">
+                                <div className="h-20 w-20 rounded-full bg-indigo-100 flex items-center justify-center mb-6 ring-8 ring-indigo-50">
+                                    <Scan className="w-10 h-10 text-indigo-600 animate-pulse" />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-800">Machine Mode Active</h3>
+                                <p className="text-slate-500 mt-2 mb-8 max-w-xs text-center">Your QR Scanner machine is ready. Point it at a barcode and pull the trigger.</p>
+                                
+                                <div className="w-full max-w-md relative">
+                                    <TextInput 
+                                        ref={machineInputRef}
+                                        onKeyDown={handleMachineScan}
+                                        placeholder="Waiting for hardware scan..."
+                                        className="w-full h-16 px-6 text-xl font-bold border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500 text-center rounded-2xl shadow-sm"
+                                    />
+                                    <div className="absolute inset-y-0 right-4 flex items-center">
+                                        <div className="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {error && (
                             <div className="mt-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 animate-in fade-in slide-in-from-top-2">
                                 <AlertCircle className="w-5 h-5 shrink-0" />
@@ -183,11 +252,10 @@ export default function Index() {
                                         <button
                                             type="button"
                                             onClick={() => setFormData({ ...formData, type: 'IN' })}
-                                            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 transition-all font-bold ${
-                                                formData.type === 'IN' 
-                                                    ? 'bg-emerald-50 border-emerald-500 text-emerald-700' 
-                                                    : 'bg-slate-50 border-slate-100 text-slate-500 hover:border-slate-200'
-                                            }`}
+                                            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 transition-all font-bold ${formData.type === 'IN'
+                                                ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
+                                                : 'bg-slate-50 border-slate-100 text-slate-500 hover:border-slate-200'
+                                                }`}
                                         >
                                             <ShoppingCart className="w-4 h-4" />
                                             Stock IN
@@ -195,11 +263,10 @@ export default function Index() {
                                         <button
                                             type="button"
                                             onClick={() => setFormData({ ...formData, type: 'OUT' })}
-                                            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 transition-all font-bold ${
-                                                formData.type === 'OUT' 
-                                                    ? 'bg-red-50 border-red-500 text-red-700' 
-                                                    : 'bg-slate-50 border-slate-100 text-slate-500 hover:border-slate-200'
-                                            }`}
+                                            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 transition-all font-bold ${formData.type === 'OUT'
+                                                ? 'bg-red-50 border-red-500 text-red-700'
+                                                : 'bg-slate-50 border-slate-100 text-slate-500 hover:border-slate-200'
+                                                }`}
                                         >
                                             <Trash2 className="w-4 h-4" />
                                             Stock OUT

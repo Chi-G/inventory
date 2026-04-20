@@ -1,58 +1,95 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Elevate Interiors - Inventory Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A premium, high-end inventory management solution designed for **Elevate Interiors**. Built with a focus on visual excellence, operational accuracy, and a seamless user experience.
 
-## About Laravel
+## 🚀 Key Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Intelligent Dashboard**: Real-time KPIs for total stock value, item counts, and low-stock alerts.
+- **Advanced Catalog Management**: 
+  - Hierarchical category structure (Furniture, Lighting, Decor, etc.).
+  - Custom product attributes and JSON-based specifications.
+  - Image gallery support for all catalog items.
+- **Stock Logistics & Audit**: 
+  - Traceable stock movements (Inflow/Outflow) linked to users and suppliers.
+  - Automated adjustment logs for full transparency.
+- **Analytics & Reporting**: 
+  - **Inventory Velocity**: Interactive 30-day trend charts using Recharts.
+  - **Data Portability**: CSV Exports for catalog audits and movement logs.
+  - **Professional Product Sheets**: Generate elegant A4 datasheets with branding, full specs, and barcodes for physical inventory.
+- **Handheld Scanner Integration**: 
+  - Mobile-optimized barcode scanning (HTML5-QRCode).
+  - Haptic/Audio feedback (Beeps) for successful logistics operations.
+- **Real-time Notifications**:
+  - **Live Inventory Sync**: Powered by Pusher. Notifications appear instantly across all logged-in devices when stock movements occur.
+  - **Activity Feed**: Listen to "Stock Added", "Stock Removed", or "Adjusted" events in real-time.
+- **Secure RBAC**: Granular roles for Super Admin, Admin, Manager, and Staff.
+- **Automated CI/CD**: 
+  - **GitHub Actions**: Integrated pipeline for zero-downtime deployments to Hostinger.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠️ Technology Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Framework**: [Laravel 13.x](https://laravel.com)
+- **Frontend**: [React 18](https://reactjs.org) with [Inertia.js](https://inertiajs.com)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com) (Premium curated palettes)
+- **Analytics**: [Recharts](https://recharts.org)
+- **Database**: MySQL 8.x
 
-## Learning Laravel
+## 📦 Local Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Chi-G/inventory.git
+   cd inventory
+   ```
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Install Dependencies**:
+   ```bash
+   composer install
+   npm install
+   ```
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+3. **Environment Setup**:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-## Agentic Development
+4. **Database Configuration**:
+   Create a database named `elevate` and update your `.env` file credentials.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+5. **Run Migrations & Seeders**:
+   ```bash
+   php artisan migrate --seed
+   ```
 
-```bash
-composer require laravel/boost --dev
+6. **Start Development**:
+   ```bash
+   npm run dev
+   # In a separate terminal
+   php artisan serve
+   ```
 
-php artisan boost:install
-```
+## 🌐 Production Deployment
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+The application is pre-configured for deployment in subdirectories (specifically `forahia.com/inventory/`).
 
-## Contributing
+### Hostinger Deployment Logic
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. **Update Code**:
+   ```bash
+   git pull origin main
+   ```
 
-## Code of Conduct
+2. **Run Deployment Script**:
+   ```bash
+   sh deploy.sh
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+*Demo link: `https://forahia.com/inventory`*
 
-## Security Vulnerabilities
+## 📄 Ownership
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Proprietary software developed for **Elevate Interiors**.
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+© 2026 Elevate Interiors. All Rights Reserved.

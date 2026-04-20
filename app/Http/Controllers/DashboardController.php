@@ -25,7 +25,7 @@ class DashboardController extends Controller
             ->total_value ?? 0;
 
         // Low Stock Count: Products where SUM(movements.quantity) <= alert_threshold
-        // Use leftJoin to include products with no movements (stock = 0)
+        // Using leftJoin to include products with no movements (stock = 0)
         $lowStockCount = Product::select('products.id')
             ->leftJoin('stock_movements', 'products.id', '=', 'stock_movements.product_id')
             ->groupBy('products.id', 'products.alert_threshold')

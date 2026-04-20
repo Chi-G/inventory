@@ -2,6 +2,8 @@ import '../css/app.css';
 import axios from 'axios';
 window.axios = axios;
 
+import './echo';
+
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';

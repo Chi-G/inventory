@@ -153,7 +153,11 @@ export default function ProductSheet({ product }) {
                                 Object.entries(product.attributes).map(([key, value]) => (
                                     <div key={key} className="flex justify-between items-center text-sm border-b border-slate-50 pb-2">
                                         <span className="text-slate-400 font-bold uppercase text-[10px]">{key}</span>
-                                        <span className="text-slate-900 font-bold">{value}</span>
+                                        <span className="text-slate-900 font-bold">
+                                            {typeof value === 'object' && value !== null 
+                                                ? (value.value || value.name || JSON.stringify(value)) 
+                                                : String(value)}
+                                        </span>
                                     </div>
                                 ))
                             ) : (

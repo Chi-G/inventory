@@ -54,6 +54,9 @@ class StockMovementController extends Controller
                 'ADJUSTMENT' => 'Stock Adjustment',
             };
 
+            // Dispatch broadcasting event
+            event(new \App\Events\StockUpdated($product->fresh(), $request->user(), $validated['type']));
+
             return back()->with('success', "{$action} of {$validated['quantity']} units recorded successfully for {$product->name}.");
             
         } catch (Exception $e) {

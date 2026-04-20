@@ -52,7 +52,7 @@ class Product extends Model
         $quantity = match ($type) {
             'IN' => abs($absoluteQuantity),
             'OUT' => -abs($absoluteQuantity),
-            'ADJUSTMENT' => $absoluteQuantity, // Could be positive or negative
+            'ADJUSTMENT' => $absoluteQuantity,
             default => throw new \InvalidArgumentException("Invalid stock movement type: {$type}"),
         };
 
