@@ -2,7 +2,7 @@
 
 A premium, high-end inventory management solution designed for **Elevate Interiors**. Built with a focus on visual excellence, operational accuracy, and a seamless user experience.
 
-## 🚀 Key Features
+## Key Features
 
 - **Intelligent Dashboard**: Real-time KPIs for total stock value, item counts, and low-stock alerts.
 - **Advanced Catalog Management**: 
@@ -26,7 +26,7 @@ A premium, high-end inventory management solution designed for **Elevate Interio
 - **Automated CI/CD**: 
   - **GitHub Actions**: Integrated pipeline for zero-downtime deployments to Hostinger.
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Framework**: [Laravel 13.x](https://laravel.com)
 - **Frontend**: [React 18](https://reactjs.org) with [Inertia.js](https://inertiajs.com)
@@ -34,7 +34,7 @@ A premium, high-end inventory management solution designed for **Elevate Interio
 - **Analytics**: [Recharts](https://recharts.org)
 - **Database**: MySQL 8.x
 
-## 📦 Local Installation
+## Local Installation
 
 1. **Clone the repository**:
    ```bash
@@ -69,7 +69,7 @@ A premium, high-end inventory management solution designed for **Elevate Interio
    php artisan serve
    ```
 
-## 🌐 Production Deployment
+## Production Deployment
 
 The application is pre-configured for deployment in subdirectories (specifically `forahia.com/inventory/`).
 
@@ -87,7 +87,7 @@ The application is pre-configured for deployment in subdirectories (specifically
 
 *Demo link: `https://forahia.com/inventory`*
 
-## 📄 Ownership
+## Ownership
 
 Proprietary software developed for **Elevate Interiors**.
 
