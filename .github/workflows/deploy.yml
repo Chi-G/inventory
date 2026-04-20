@@ -49,6 +49,15 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.PORT }}
         script: |
-          cd /home/u157985566/domains/forahia.com/public_html/inventory
-          git pull origin main
+          cd /home/u157985566/domains/forahia.com/public_html/inventory || mkdir -p /home/u157985566/domains/forahia.com/public_html/inventory && cd /home/u157985566/domains/forahia.com/public_html/inventory
+          if [ ! -d ".git" ]; then
+            echo "Initializing Git repository in existing folder..."
+            git init
+            git remote add origin https://${{ secrets.GITHUB_API_TOKEN }}@github.com/Chi-G/inventory.git
+            git fetch origin main
+            git reset --hard origin/main
+          else
+            echo "Updating existing repository..."
+            git pull origin main
+          fi
           bash deploy.sh
