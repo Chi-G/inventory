@@ -48,7 +48,12 @@ jobs:
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.PORT }}
+        timeout: 60s
+        command_timeout: 30m
         script: |
+          # Debug: Ensure token is present (will print 'present' or 'missing')
+          if [ -z "${{ secrets.GITHUB_API_TOKEN }}" ]; then echo "TOKEN MISSING"; else echo "TOKEN OK"; fi
+          
           cd /home/u157985566/domains/forahia.com/public_html/inventory || mkdir -p /home/u157985566/domains/forahia.com/public_html/inventory && cd /home/u157985566/domains/forahia.com/public_html/inventory
           if [ ! -d ".git" ]; then
             echo "Initializing Git repository in existing folder..."
