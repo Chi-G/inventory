@@ -31,23 +31,6 @@ jobs:
     - name: Run Build
       run: npm run build
 
-    - name: Upload code via SSH (Sync repository)
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        port: ${{ secrets.PORT }}
-        script: |
-          cd /home/u157985566/domains/forahia.com/public_html/inventory || mkdir -p /home/u157985566/domains/forahia.com/public_html/inventory && cd /home/u157985566/domains/forahia.com/public_html/inventory
-          if [ ! -d ".git" ]; then
-            git init
-            git remote add origin https://${{ secrets.GITHUB_API_TOKEN }}@github.com/Chi-G/inventory.git
-          fi
-          git fetch origin main
-          git reset --hard origin/main
-          mkdir -p public/build
-
     - name: Copy Build Assets via SCP
       uses: appleboy/scp-action@v0.1.7
       with:
@@ -55,17 +38,32 @@ jobs:
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.PORT }}
+        debug: true
         source: "public/build/*"
         target: "/home/u157985566/domains/forahia.com/public_html/inventory/public/build/"
         strip_components: 2
 
-    - name: Run Post-Deployment Tasks
+    - name: Run Sync and Post-Deployment Tasks
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.PORT }}
+        debug: true
+        timeout: 60s
+        command_timeout: 30m
         script: |
-          cd /home/u157985566/domains/forahia.com/public_html/inventory
+          set -e
+          cd /home/u157985566/domains/forahia.com/public_html/inventory || mkdir -p /home/u157985566/domains/forahia.com/public_html/inventory && cd /home/u157985566/domains/forahia.com/public_html/inventory
+          
+          echo "📥 Syncing code..."
+          if [ ! -d ".git" ]; then
+            git init
+            git remote add origin https://${{ secrets.GITHUB_API_TOKEN }}@github.com/Chi-G/inventory.git
+          fi
+          git fetch origin main
+          git reset --hard origin/main
+          
+          echo "🚀 Running post-deployment script..."
           bash deploy.sh
