@@ -1,15 +1,17 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /inventory/
 
-    # Handle Static Files
-    RewriteCond %{REQUEST_URI} !^/public/
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME} !-f
+    # 1. Handle Static Files: If it exists in public/, serve it from there
+    # (Checking for the file inside the public subdirectory)
+    RewriteCond %{DOCUMENT_ROOT}/inventory/public/$1 -f
     RewriteRule ^(.*)$ public/$1 [L]
 
-    # Handle Front Controller
-    RewriteCond %{REQUEST_FILENAME} !-d
+    # 2. Handle Laravel Routes: Everything else goes to the index.php
+    # We explicitly point to public/index.php
     RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ public/index.php [L,QSA]
+
+    # 3. Handle Root Access
+    RewriteRule ^$ public/index.php [L,QSA]
 </IfModule>
