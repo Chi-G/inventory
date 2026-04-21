@@ -13,7 +13,13 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)/$ $1 [L,R=301]
 
-    # Force the app to use the public directory for all requests
+    # Force the app to use the public directory
+    # Use the /index.php/$1 pattern to explicitly pass the path to Laravel
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ public/index.php/$1 [L,QSA]
+
+    # Handle Static Files (Images, CSS, etc.)
     RewriteCond %{REQUEST_URI} !^/public/
-    RewriteRule ^(.*)$ public/$1 [L,QSA]
+    RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>

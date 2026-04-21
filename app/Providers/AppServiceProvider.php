@@ -29,16 +29,15 @@ class AppServiceProvider extends ServiceProvider
         Vite::prefetch(concurrency: 3);
 
         if (config('app.env') === 'production') {
+            // Force HTTPS and the correct root URL
+            URL::forceScheme('https');
+            URL::forceRootUrl(config('app.url'));
+            
+            // Ensure Vite uses the correct asset URL
             $url = config('app.url');
-
-            // Force the Vite Asset URL at the PHP environment level
             putenv("VITE_ASSET_URL=$url");
             $_ENV['VITE_ASSET_URL'] = $url;
             $_SERVER['VITE_ASSET_URL'] = $url;
-
-            // Ensure all generated URLs use the subdirectory path
-            URL::forceRootUrl($url);
-            URL::forceScheme('https');
         }
     }
 }

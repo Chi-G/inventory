@@ -15,6 +15,11 @@ php artisan migrate --force
 
 # 3. Optimization
 echo "⚡ Optimizing caches..."
+# 2. Fix environment variables for subdirectory
+sed -i 's|APP_URL=.*|APP_URL=https://forahia.com/inventory|g' .env
+sed -i 's|ASSET_URL=.*|ASSET_URL=https://forahia.com/inventory|g' .env
+
+# 3. Clear and cache config
 # Clear caches first to ensure fresh state
 php artisan optimize:clear
 # Rebuild caches
