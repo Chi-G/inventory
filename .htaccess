@@ -9,6 +9,7 @@
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Send Requests To Public Directory...
-    RewriteRule ^(.*)$ public/$1 [L]
+    # Force the app to use the public directory for all requests
+    RewriteRule ^$ public/index.php [L]
+    RewriteRule ^((?!public/).*)$ public/$1 [L]
 </IfModule>
