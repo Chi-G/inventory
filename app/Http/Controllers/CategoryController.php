@@ -46,7 +46,7 @@ class CategoryController extends Controller
         $category->update($validated);
 
         return redirect()->back()->with('success', 'Category updated successfully.');
-    }
+    } 
 
     public function destroy(Category $category)
     {

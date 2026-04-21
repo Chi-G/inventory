@@ -61,7 +61,7 @@ export default function Index({ categories, parentCategories }) {
         });
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = (category) => {
         Swal.fire({
             title: 'Are you sure?',
             text: "This category will be permanently deleted!",
@@ -72,7 +72,7 @@ export default function Index({ categories, parentCategories }) {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(route('categories.destroy', { id, slug: auth.user.slug }));
+                router.delete(route('categories.destroy', { category: id, slug: auth.user.slug }));
             }
         });
     };
@@ -88,8 +88,8 @@ export default function Index({ categories, parentCategories }) {
                 </div>
                 {auth.can['categories.create'] && (
                     <div className="flex-shrink-0">
-                        <PrimaryButton 
-                            onClick={openCreateModal} 
+                        <PrimaryButton
+                            onClick={openCreateModal}
                             className="w-full md:w-auto h-11 px-6 bg-indigo-600 hover:bg-indigo-700 flex items-center justify-center gap-2"
                         >
                             <Plus className="w-5 h-5" />
@@ -102,14 +102,14 @@ export default function Index({ categories, parentCategories }) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {categories.data.map((category) => (
                     <div key={category.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all group overflow-hidden relative">
-                         <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                        <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                             {auth.can['categories.edit'] && (
                                 <button onClick={() => openEditModal(category)} className="p-2 bg-slate-50 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg border border-slate-100 transition-colors">
                                     <Edit className="w-4 h-4" />
                                 </button>
                             )}
-                         </div>
-                        
+                        </div>
+
                         <div className="flex items-center gap-2 mb-4">
                             <div className="h-10 w-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
                                 {category.parent_id ? <Layers className="w-5 h-5" /> : <List className="w-5 h-5" />}
@@ -121,12 +121,12 @@ export default function Index({ categories, parentCategories }) {
                                 </div>
                             )}
                         </div>
-                        
+
                         <h3 className="text-lg font-bold text-slate-800 mb-2 truncate">{category.name}</h3>
                         <p className="text-sm text-slate-500 line-clamp-2 min-h-[2.5rem]">
                             {category.description || 'No description provided.'}
                         </p>
-                        
+
                         <div className="mt-6 pt-4 border-t border-slate-50 flex justify-between items-center">
                             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                                 {category.children_count || 0} Sub-categories
@@ -149,7 +149,7 @@ export default function Index({ categories, parentCategories }) {
                     </div>
                 )}
             </div>
-            
+
             {/* Pagination */}
             {categories.links && categories.links.length > 3 && (
                 <div className="mt-8 flex justify-center gap-2">
@@ -160,11 +160,10 @@ export default function Index({ categories, parentCategories }) {
                             preserveScroll
                             preserveState
                             dangerouslySetInnerHTML={{ __html: link.label }}
-                            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                                link.active 
-                                    ? 'bg-indigo-600 text-white shadow-md' 
+                            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${link.active
+                                    ? 'bg-indigo-600 text-white shadow-md'
                                     : 'text-slate-500 hover:bg-white hover:text-indigo-600 border border-transparent hover:border-indigo-100'
-                            } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                         />
                     ))}
                 </div>
@@ -174,7 +173,7 @@ export default function Index({ categories, parentCategories }) {
             <Modal show={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)}>
                 <form onSubmit={handleCreate} className="p-8">
                     <h2 className="text-xl font-bold text-slate-900 mb-6">Create New Category</h2>
-                    
+
                     <div className="space-y-5">
                         <div>
                             <InputLabel htmlFor="name" value="Category Name" className="text-slate-600" />
@@ -231,7 +230,7 @@ export default function Index({ categories, parentCategories }) {
                     <div className="flex justify-between items-start mb-6">
                         <h2 className="text-xl font-bold text-slate-900">Edit Category</h2>
                         {auth.can['categories.delete'] && (
-                            <button 
+                            <button
                                 type="button"
                                 onClick={() => {
                                     Swal.fire({
@@ -244,7 +243,7 @@ export default function Index({ categories, parentCategories }) {
                                         confirmButtonText: 'Yes, delete it!'
                                     }).then((result) => {
                                         if (result.isConfirmed) {
-                                            router.delete(route('categories.destroy', { id: selectedCategory.id, slug: auth.user.slug }), {
+                                            router.delete(route('categories.destroy', { category: selectedCategory.id, slug: auth.user.slug }), {
                                                 onSuccess: () => setIsEditModalOpen(false)
                                             });
                                         }
@@ -256,7 +255,7 @@ export default function Index({ categories, parentCategories }) {
                             </button>
                         )}
                     </div>
-                    
+
                     <div className="space-y-5">
                         <div>
                             <InputLabel htmlFor="edit_name" value="Category Name" />

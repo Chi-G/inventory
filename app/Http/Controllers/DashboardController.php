@@ -18,9 +18,8 @@ class DashboardController extends Controller
         $totalProducts = Product::count();
         
         // Total Value: SUM(current_stock * retail_price)
-        $totalValue = Product::selectRaw('SUM(current_stock * retail_price) as total_value')
-            ->first()
-            ->total_value ?? 0;
+        $totalValue = Product::selectRaw('COALESCE(SUM(current_stock * retail_price), 0) as total_value')
+            ->value('total_value');
  
         // Low Stock Count: Products where current_stock <= alert_threshold
         $lowStockCount = Product::whereColumn('current_stock', '<=', 'alert_threshold')
