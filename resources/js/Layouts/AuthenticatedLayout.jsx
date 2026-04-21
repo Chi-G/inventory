@@ -42,6 +42,16 @@ export default function AuthenticatedLayout({ header, children }) {
                 // router.reload({ only: ['movements', 'products'] });
             });
 
+        // EXPOSE MOCK NOTIFICATION FOR LOCAL TESTING
+        window.__mockNotification = (name = 'Mock Sofa') => {
+            Toast.fire({
+                icon: 'info',
+                title: `Stock Added: ${name}`,
+                text: 'Simulated locally by Developer',
+                timer: 5000
+            });
+        };
+
         return () => channel.stopListening('.stock.updated');
     }, []);
 
