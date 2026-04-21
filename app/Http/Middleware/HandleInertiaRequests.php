@@ -33,11 +33,43 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
+                'can' => $request->user() ? $this->getPermissions($request->user()) : [],
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+            'app' => [
+                'url' => config('app.url'),
+                'asset_url' => asset(''),
+                'is_production' => app()->environment('production'),
+            ],
+            'pusher' => [
+                'key' => config('broadcasting.connections.pusher.key'),
+                'cluster' => config('broadcasting.connections.pusher.options.cluster'),
+            ],
         ];
+    }
+
+    /**
+     * Get permission map for the user.
+     */
+    protected function getPermissions($user): array
+    {
+        // 1. Fetch all permission names once
+        $allPermissions = \App\Models\Permission::pluck('name');
+
+        // 2. Shortcut for Super Admin
+        if ($user->role === 'Super Admin') {
+            return $allPermissions->mapWithKeys(fn($name) => [$name => true])->toArray();
+        }
+
+        // 3. Efficiently map for regular users
+        // Load the user's specific permissions through their role
+        $rolePermissions = $user->role_relation ? $user->role_relation->permissions->pluck('name')->toArray() : [];
+
+        return $allPermissions->mapWithKeys(function ($name) use ($rolePermissions) {
+            return [$name => in_array($name, $rolePermissions)];
+        })->toArray();
     }
 }

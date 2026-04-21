@@ -10,19 +10,33 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::orderBy('name')->get();
+        $this->authorize('users.view');
+        
+        $query = User::orderBy('name');
+
+        // Only Super Admins can see other Super Admins
+        if (!$request->user()->isSuperAdmin()) {
+            $query->where('role', '!=', 'Super Admin');
+        }
+
+        $users = $query->get();
         return Inertia::render('Users/Index', ['users' => $users]);
     }
 
     public function store(Request $request)
     {
+        $this->authorize('users.create');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:' . User::class,
             'role' => ['required', Rule::in(['Super Admin', 'Admin', 'Manager', 'Staff'])],
         ]);
+
+        $role = \App\Models\Role::where('display_name', $validated['role'])->first();
+        $validated['role_id'] = $role?->id;
 
         $validated['password'] = Hash::make('password123');
 
@@ -33,11 +47,16 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
+        $this->authorize('users.edit');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
             'role' => ['required', Rule::in(['Super Admin', 'Admin', 'Manager', 'Staff'])],
         ]);
+
+        $role = \App\Models\Role::where('display_name', $validated['role'])->first();
+        $validated['role_id'] = $role?->id;
 
         $user->update($validated);
 
@@ -46,6 +65,8 @@ class UserController extends Controller
 
     public function destroy(Request $request, User $user)
     {
+        $this->authorize('users.delete');
+
         if ($user->id === $request->user()->id) {
              return redirect()->back()->with('error', 'You cannot delete yourself.');
         }

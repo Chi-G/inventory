@@ -14,6 +14,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorize('products.view');
         $products = Product::with('category.parent')
             ->when($request->search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
@@ -40,6 +41,8 @@ class ProductController extends Controller
 
     public function create()
     {
+        $this->authorize('products.create');
+        
         return Inertia::render('Catalog/Products/Modify', [
             'categories' => Category::roots()->with('children')->get(),
             'sku_suggestion' => 'ELV-' . strtoupper(Str::random(6)),
@@ -48,6 +51,8 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('products.create');
+        
         $validated = $request->validate([
             'sku' => 'required|string|unique:products,sku|max:50',
             'name' => 'required|string|max:255',
@@ -77,6 +82,8 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
+        $this->authorize('products.edit');
+        
         return Inertia::render('Catalog/Products/Modify', [
             'product' => $product->load('category.parent'),
             'categories' => Category::roots()->with('children')->get(),
@@ -85,6 +92,8 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
+        $this->authorize('products.edit');
+        
         $validated = $request->validate([
             'sku' => 'required|string|max:50|unique:products,sku,' . $product->id,
             'name' => 'required|string|max:255',
@@ -113,6 +122,8 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        $this->authorize('products.delete');
+        
         if ($product->image_path) {
             Storage::disk('public')->delete($product->image_path);
         }
@@ -124,6 +135,8 @@ class ProductController extends Controller
 
     public function printBarcode(Product $product)
     {
+        $this->authorize('products.barcode');
+        
         return Inertia::render('Catalog/Products/ProductSheet', [
             'product' => $product
         ]);
@@ -161,6 +174,8 @@ class ProductController extends Controller
     }
     public function export()
     {
+        $this->authorize('products.export');
+        
         $products = Product::with('category')->get();
         $csvHeader = ['SKU', 'Name', 'Category', 'Cost Price', 'Retail Price', 'Stock', 'Threshold'];
         

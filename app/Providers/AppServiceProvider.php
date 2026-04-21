@@ -5,6 +5,9 @@ namespace App\Providers;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
+use App\Models\Permission;
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -46,6 +49,27 @@ class AppServiceProvider extends ServiceProvider
             // Inject asset URL for Vite manifest resolution
             putenv("VITE_ASSET_URL=$url");
             $_ENV['VITE_ASSET_URL'] = $url;
+        }
+
+        // --- DYNAMIC PERMISSION SYSTEM ---
+        
+        // 1. Super Admin Bypass (God Mode)
+        Gate::before(function ($user, $ability) {
+            return $user->role === 'Super Admin' ? true : null;
+        });
+
+        // 2. Register all permissions as Gates
+        if (Schema::hasTable('permissions')) {
+            try {
+                $permissions = Permission::all();
+                foreach ($permissions as $permission) {
+                    Gate::define($permission->name, function ($user) use ($permission) {
+                        return $user->hasPermission($permission->name);
+                    });
+                }
+            } catch (\Exception $e) {
+                // Silently fail if DB is not ready
+            }
         }
     }
 }

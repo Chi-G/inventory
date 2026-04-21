@@ -1,9 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { History, ArrowUpRight, ArrowDownRight, RefreshCcw, User, Truck, Package, Search, Download } from 'lucide-react';
 import TextInput from '@/Components/TextInput';
 
 export default function Logs({ movements, filters }) {
+    const { auth } = usePage().props;
     const getTypeBadge = (type) => {
         switch (type) {
             case 'IN':
@@ -39,18 +40,20 @@ export default function Logs({ movements, filters }) {
                     <h1 className="text-2xl font-bold text-slate-800">Inventory Movement Logs</h1>
                     <p className="text-slate-500 mt-1">Audit trail of all stock additions, deductions, and adjustments.</p>
                 </div>
-                <a 
-                    href={route('inventory.logs.export')} 
-                    className="h-11 px-6 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-2 hover:bg-indigo-600 transition-all shadow-lg shadow-slate-200"
-                >
-                    <Download className="w-4 h-4" />
-                    Export Log (CSV)
-                </a>
+                {auth.can['inventory.logs.export'] && auth.user?.slug && (
+                    <a 
+                        href={route('inventory.logs.export', { slug: auth.user.slug })} 
+                        className="h-11 px-6 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-2 hover:bg-indigo-600 transition-all shadow-lg shadow-slate-200"
+                    >
+                        <Download className="w-4 h-4" />
+                        Export Log (CSV)
+                    </a>
+                )}
             </div>
 
             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                    <table className="w-full text-left border-collapse min-w-[1000px] lg:min-w-full">
                         <thead>
                             <tr className="bg-slate-50 border-b border-slate-200">
                                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Date & Time</th>

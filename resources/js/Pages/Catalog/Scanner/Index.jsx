@@ -122,25 +122,25 @@ export default function Index() {
 
             <div className="max-w-4xl mx-auto">
                 <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden mb-8">
-                    <div className="p-8 bg-slate-900 text-white flex justify-between items-center transition-colors">
+                    <div className="p-6 md:p-8 bg-slate-900 text-white flex flex-col md:flex-row md:justify-between md:items-center gap-6 transition-colors">
                         <div>
                             <h2 className="text-2xl font-bold flex items-center gap-2 text-indigo-400">
                                 <Scan className="w-6 h-6" />
                                 Interactive Scan Center
                             </h2>
-                            <p className="text-slate-400 mt-1">Select your scanning preference below.</p>
+                            <p className="text-slate-400 mt-1 text-sm">Select your scanning preference below.</p>
                         </div>
-                        <div className="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
+                        <div className="flex bg-slate-800 p-1.5 rounded-xl border border-slate-700 w-full md:w-auto">
                             <button 
                                 onClick={() => setScanMode('camera')}
-                                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${scanMode === 'camera' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                                className={`flex-1 md:flex-none px-4 py-3 md:py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${scanMode === 'camera' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
                             >
                                 <Camera className="w-3 h-3" />
                                 Camera
                             </button>
                             <button 
                                 onClick={() => setScanMode('machine')}
-                                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${scanMode === 'machine' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                                className={`flex-1 md:flex-none px-4 py-3 md:py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${scanMode === 'machine' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
                             >
                                 <Scan className="w-3 h-3" />
                                 QR Machine
@@ -158,7 +158,7 @@ export default function Index() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="py-20 flex flex-col items-center justify-center border-2 border-dashed border-indigo-200 bg-indigo-50/30 rounded-2xl animate-in slide-in-from-bottom-4 duration-500">
+                            <div className="py-12 md:py-20 flex flex-col items-center justify-center border-2 border-dashed border-indigo-200 bg-indigo-50/30 rounded-2xl animate-in slide-in-from-bottom-4 duration-500">
                                 <div className="h-20 w-20 rounded-full bg-indigo-100 flex items-center justify-center mb-6 ring-8 ring-indigo-50">
                                     <Scan className="w-10 h-10 text-indigo-600 animate-pulse" />
                                 </div>
@@ -244,8 +244,8 @@ export default function Index() {
                             </div>
                         </div>
 
-                        <form onSubmit={handleAdjustment} className="p-8 space-y-6">
-                            <div className="grid grid-cols-2 gap-4">
+                        <form onSubmit={handleAdjustment} className="p-6 md:p-8 space-y-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <InputLabel value="Adjustment Type" className="mb-2" />
                                     <div className="grid grid-cols-1 gap-2">

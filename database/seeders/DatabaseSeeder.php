@@ -15,11 +15,44 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Super Admin',
-            'email' => 'admin@elevate.com',
-            'role' => 'Super Admin',
-            'password' => bcrypt('password123')
-        ]);
+        // Super Admin
+        User::firstOrCreate(
+            ['email' => 'admin@elevate.com'],
+            [
+                'name' => 'Super Admin',
+                'role' => 'Super Admin',
+                'password' => bcrypt('password123')
+            ]
+        );
+
+        // Admin
+        User::firstOrCreate(
+            ['email' => 'general@elevate.com'],
+            [
+                'name' => 'General Admin',
+                'role' => 'Admin',
+                'password' => bcrypt('password123')
+            ]
+        );
+
+        // Manager
+        User::firstOrCreate(
+            ['email' => 'manager@elevate.com'],
+            [
+                'name' => 'Stock Manager',
+                'role' => 'Manager',
+                'password' => bcrypt('password123')
+            ]
+        );
+
+        // Staff
+        User::firstOrCreate(
+            ['email' => 'staff@elevate.com'],
+            [
+                'name' => 'Inventory Staff',
+                'role' => 'Staff',
+                'password' => bcrypt('password123')
+            ]
+        );
     }
 }

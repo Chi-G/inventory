@@ -10,6 +10,8 @@ class CategoryController extends Controller
 {
     public function index()
     {
+        $this->authorize('categories.view');
+
         return Inertia::render('Catalog/Categories/Index', [
             'categories' => Category::roots()->withCount('children')->latest()->paginate(10),
             'parentCategories' => Category::roots()->get(),
@@ -18,6 +20,8 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('categories.create');
+
         $validated = $request->validate([
             'name' => 'required|string|unique:categories,name|max:255',
             'description' => 'nullable|string|max:500',
@@ -31,6 +35,8 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $category)
     {
+        $this->authorize('categories.edit');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
             'description' => 'nullable|string|max:500',
@@ -44,6 +50,8 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
+        $this->authorize('categories.delete');
+
         if ($category->products()->exists()) {
             return redirect()->back()->with('error', 'Cannot delete category containing products.');
         }

@@ -27,11 +27,11 @@ export default function UpdateProfileInformation({
     return (
         <section className={className}>
             <header>
-                <h2 className="text-lg font-medium text-slate-900 dark:text-slate-100">
+                <h2 className="text-lg font-medium text-slate-900">
                     Profile Information
                 </h2>
 
-                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                <p className="mt-1 text-sm text-slate-600">
                     Update your account's profile information. Your email address is managed by the system administrator.
                 </p>
             </header>
@@ -59,7 +59,7 @@ export default function UpdateProfileInformation({
                     <TextInput
                         id="email"
                         type="email"
-                        className="mt-1 block w-full bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-not-allowed border-slate-200 dark:border-slate-700"
+                        className="mt-1 block w-full bg-slate-50 text-slate-500 cursor-not-allowed border-slate-200"
                         value={data.email}
                         readOnly
                         autoComplete="username"

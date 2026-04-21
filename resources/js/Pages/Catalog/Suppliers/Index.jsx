@@ -11,7 +11,7 @@ import { Truck, Plus, Edit, Trash2, Mail, Phone, User } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 export default function Index({ suppliers }) {
-    const { flash } = usePage().props;
+    const { auth, flash } = usePage().props;
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedSupplier, setSelectedSupplier] = useState(null);
@@ -43,7 +43,7 @@ export default function Index({ suppliers }) {
 
     const handleCreate = (e) => {
         e.preventDefault();
-        post(route('suppliers.store'), {
+        post(route('suppliers.store', { slug: auth.user.slug }), {
             onSuccess: () => {
                 setIsCreateModalOpen(false);
                 reset();
@@ -53,7 +53,7 @@ export default function Index({ suppliers }) {
 
     const handleEdit = (e) => {
         e.preventDefault();
-        put(route('suppliers.update', selectedSupplier.id), {
+        put(route('suppliers.update', { supplier: selectedSupplier.id, slug: auth.user.slug }), {
             onSuccess: () => {
                 setIsEditModalOpen(false);
                 reset();
@@ -73,7 +73,7 @@ export default function Index({ suppliers }) {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(route('suppliers.destroy', id));
+                router.delete(route('suppliers.destroy', { id, slug: auth.user.slug }));
             }
         });
     };
@@ -82,88 +82,165 @@ export default function Index({ suppliers }) {
         <AuthenticatedLayout header="Suppliers">
             <Head title="Suppliers" />
 
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-800">Vendors & Suppliers</h1>
                     <p className="text-slate-500 mt-1">Manage your furniture and materials supply network.</p>
                 </div>
-                <PrimaryButton onClick={openCreateModal} className="h-11 px-6 bg-slate-900 border-transparent hover:bg-slate-800 flex items-center gap-2">
-                    <Plus className="w-5 h-5" />
-                    Add Supplier
-                </PrimaryButton>
+                {auth.can['suppliers.create'] && (
+                    <PrimaryButton 
+                        onClick={openCreateModal} 
+                        className="w-full md:w-auto h-11 px-6 bg-indigo-600 border-transparent hover:bg-indigo-700 flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95"
+                    >
+                        <Plus className="w-5 h-5" />
+                        Add Supplier
+                    </PrimaryButton>
+                )}
             </div>
 
 
 
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-slate-50/50">
-                                <th className="px-6 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Supplier Name</th>
-                                <th className="px-6 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Contact Details</th>
+            {/* Desktop View - Table */}
+            <div className="hidden md:block bg-white rounded-3xl border border-slate-200 shadow-sm overflow-x-auto text-sm">
+                <table className="w-full text-left border-collapse min-w-[800px] lg:min-w-full">
+                    <thead>
+                        <tr className="bg-slate-50/50">
+                            <th className="px-6 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Supplier Name</th>
+                            <th className="px-6 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Contact Details</th>
+                            {(auth.can['suppliers.edit'] || auth.can['suppliers.delete']) && (
                                 <th className="px-6 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                            {suppliers.map((supplier) => (
-                                <tr key={supplier.id} className="hover:bg-slate-50/30 transition-colors group">
-                                    <td className="px-6 py-6">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                                                <Truck className="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-slate-800">{supplier.name}</p>
-                                                <p className="text-xs text-slate-500 mt-0.5">Verified Vendor</p>
-                                            </div>
+                            )}
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                        {suppliers.map((supplier) => (
+                            <tr key={supplier.id} className="hover:bg-slate-50/30 transition-colors group">
+                                <td className="px-6 py-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                            <Truck className="w-5 h-5" />
                                         </div>
-                                    </td>
-                                    <td className="px-6 py-6">
-                                        <div className="space-y-1">
-                                            {supplier.contact_person && (
-                                                <div className="flex items-center text-sm text-slate-600 gap-2">
-                                                    <User className="w-3.5 h-3.5 text-slate-400" />
-                                                    {supplier.contact_person}
-                                                </div>
-                                            )}
-                                            {supplier.email && (
-                                                <div className="flex items-center text-sm text-slate-600 gap-2">
-                                                    <Mail className="w-3.5 h-3.5 text-slate-400" />
-                                                    {supplier.email}
-                                                </div>
-                                            )}
+                                        <div>
+                                            <p className="font-bold text-slate-800">{supplier.name}</p>
+                                            <p className="text-xs text-slate-500 mt-0.5">Verified Vendor</p>
                                         </div>
-                                    </td>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-6">
+                                    <div className="space-y-1">
+                                        {supplier.contact_person && (
+                                            <div className="flex items-center text-sm text-slate-600 gap-2">
+                                                <User className="w-3.5 h-3.5 text-slate-400" />
+                                                {supplier.contact_person}
+                                            </div>
+                                        )}
+                                        {supplier.email && (
+                                            <div className="flex items-center text-sm text-slate-600 gap-2">
+                                                <Mail className="w-3.5 h-3.5 text-slate-400" />
+                                                {supplier.email}
+                                            </div>
+                                        )}
+                                    </div>
+                                </td>
+                                {(auth.can['suppliers.edit'] || auth.can['suppliers.delete']) && (
                                     <td className="px-6 py-6 text-right">
                                         <div className="flex justify-end gap-2">
-                                            <button 
-                                                onClick={() => openEditModal(supplier)}
-                                                className="h-9 w-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-all"
-                                            >
-                                                <Edit className="w-4 h-4" />
-                                            </button>
-                                            <button 
-                                                onClick={() => handleDelete(supplier.id)}
-                                                className="h-9 w-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
+                                            {auth.can['suppliers.edit'] && (
+                                                <button 
+                                                    onClick={() => openEditModal(supplier)}
+                                                    className="h-9 w-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-all"
+                                                >
+                                                    <Edit className="w-4 h-4" />
+                                                </button>
+                                            )}
+                                            {auth.can['suppliers.delete'] && (
+                                                <button 
+                                                    onClick={() => handleDelete(supplier.id)}
+                                                    className="h-9 w-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
-                                </tr>
-                            ))}
-                            {suppliers.length === 0 && (
-                                <tr>
-                                    <td colSpan="3" className="px-6 py-20 text-center text-slate-400 italic">
-                                        No suppliers registered in the system yet.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                )}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
+
+            {/* Mobile View - Cards */}
+            <div className="md:hidden space-y-4">
+                {suppliers.map((supplier) => (
+                    <div key={supplier.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm transition-all active:scale-[0.98]">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500">
+                                    <Truck className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-slate-800 leading-tight">{supplier.name}</p>
+                                    <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mt-0.5">Verified Vendor</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                {auth.can['suppliers.edit'] && (
+                                    <button 
+                                        onClick={() => openEditModal(supplier)}
+                                        className="h-9 w-9 flex items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-100"
+                                    >
+                                        <Edit className="w-4 h-4" />
+                                    </button>
+                                )}
+                                {auth.can['suppliers.delete'] && (
+                                    <button 
+                                        onClick={() => handleDelete(supplier.id)}
+                                        className="h-9 w-9 flex items-center justify-center rounded-lg bg-red-50 text-red-600 border border-red-100"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        {(supplier.contact_person || supplier.email || supplier.phone) && (
+                            <div className="space-y-3 pt-4 border-t border-slate-50">
+                                {supplier.contact_person && (
+                                    <div className="flex items-center text-sm text-slate-600 gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
+                                            <User className="w-3.5 h-3.5 text-slate-400" />
+                                        </div>
+                                        <span className="font-medium text-slate-700">{supplier.contact_person}</span>
+                                    </div>
+                                )}
+                                {supplier.email && (
+                                    <div className="flex items-center text-sm text-slate-600 gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
+                                            <Mail className="w-3.5 h-3.5 text-slate-400" />
+                                        </div>
+                                        <span className="text-slate-600 truncate">{supplier.email}</span>
+                                    </div>
+                                )}
+                                {supplier.phone && (
+                                    <div className="flex items-center text-sm text-slate-600 gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
+                                            <Phone className="w-3.5 h-3.5 text-slate-400" />
+                                        </div>
+                                        <span className="text-slate-600">{supplier.phone}</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            {suppliers.length === 0 && (
+                <div className="py-20 text-center bg-white rounded-3xl border border-slate-200 shadow-sm text-slate-400 italic">
+                    No suppliers registered in the system yet.
+                </div>
+            )}
 
             {/* Create/Edit Modals (combined or separate as per your style) */}
             <Modal show={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)}>
@@ -184,7 +261,7 @@ export default function Index({ suppliers }) {
                             <InputError className="mt-2" message={errors.name} />
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <InputLabel htmlFor="contact_person" value="Contact Person" />
                                 <TextInput
@@ -242,7 +319,7 @@ export default function Index({ suppliers }) {
                             />
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <InputLabel htmlFor="edit_contact" value="Contact Person" />
                                 <TextInput

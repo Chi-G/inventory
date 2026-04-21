@@ -13,6 +13,8 @@ class StockMovementController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('inventory.view');
+        
         $movements = \App\Models\StockMovement::with(['product', 'user', 'supplier'])
             ->when($request->type, function ($query, $type) {
                 $query->where('type', $type);
@@ -32,6 +34,8 @@ class StockMovementController extends Controller
      */
     public function store(Request $request, Product $product)
     {
+        $this->authorize('inventory.adjust');
+
         $validated = $request->validate([
             'quantity' => 'required|integer|min:1',
             'type' => 'required|in:IN,OUT,ADJUSTMENT',
@@ -65,6 +69,8 @@ class StockMovementController extends Controller
     }
     public function export()
     {
+        $this->authorize('inventory.export');
+
         $movements = \App\Models\StockMovement::with(['product', 'user', 'supplier'])->latest()->get();
         $csvHeader = ['Date', 'Type', 'Product SKU', 'Product Name', 'Quantity', 'Handled By', 'Supplier', 'Notes'];
 

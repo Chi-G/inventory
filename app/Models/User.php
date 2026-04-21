@@ -27,6 +27,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'uuid',
+        'role_id',
     ];
 
     /**
@@ -38,6 +40,13 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['slug'];
 
     /**
      * Get the attributes that should be cast.
@@ -74,5 +83,43 @@ class User extends Authenticatable
     public function isManager()
     {
         return in_array($this->role, ['Super Admin', 'Admin', 'Manager']);
+    }
+
+    /**
+     * Boot the model to auto-generate UUID on creation
+     */
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+            if (!$user->uuid) {
+                $user->uuid = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
+
+    /**
+     * Get the role-based URL slug
+     */
+    public function getSlugAttribute()
+    {
+        return \Illuminate\Support\Str::slug($this->role) . '-' . $this->uuid;
+    }
+
+    /**
+     * Get the user's role relationship
+     */
+    public function role_relation(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    /**
+     * Check if user has a specific permission
+     */
+    public function hasPermission(string $permissionName): bool
+    {
+        if ($this->isSuperAdmin()) return true;
+        
+        return $this->role_relation && $this->role_relation->permissions->contains('name', $permissionName);
     }
 }

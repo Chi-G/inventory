@@ -15,6 +15,20 @@ class StockMovement extends Model
         'notes',
     ];
 
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted()
+    {
+        static::created(function ($movement) {
+            $movement->product->increment('current_stock', $movement->quantity);
+        });
+
+        static::deleted(function ($movement) {
+            $movement->product->decrement('current_stock', $movement->quantity);
+        });
+    }
+
     public function product()
     {
         return $this->belongsTo(Product::class);

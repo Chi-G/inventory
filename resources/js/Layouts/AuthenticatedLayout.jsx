@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/Layouts/Sidebar';
 import Dropdown from '@/Components/Dropdown';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 import { usePage } from '@inertiajs/react';
 import Swal from 'sweetalert2';
 
@@ -36,7 +37,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     text: `Handled by ${data.user.name}`,
                     timer: 8000
                 });
-                
+
                 // Optionally refresh current page data if on a list view
                 // router.reload({ only: ['movements', 'products'] });
             });
@@ -45,27 +46,34 @@ export default function AuthenticatedLayout({ header, children }) {
     }, []);
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex font-sans transition-colors duration-300">
+        <div className="min-h-screen bg-slate-50 flex font-sans transition-colors duration-300">
             {/* Sidebar Desktop & Mobile */}
             <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
             <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
                 {/* Header Navbar */}
-                <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-4 sm:px-6 lg:px-8 shrink-0 z-10 w-full relative sm:drop-shadow-sm justify-between transition-colors">
+                <header className="h-16 bg-white border-b border-slate-200 flex items-center px-4 sm:px-6 lg:px-8 shrink-0 z-10 w-full relative sm:drop-shadow-sm justify-between transition-colors">
                     {/* Mobile Menu Button */}
                     <div className="flex items-center">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="md:hidden p-2 -ml-2 rounded-md text-slate-400 hover:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="md:hidden p-2 -ml-2 rounded-md text-slate-400 hover:text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
                         </button>
 
+                        {/* Mobile Logo */}
+                        <div className="md:hidden ml-2 flex items-center gap-2">
+                            <div className="h-11 w-11 rounded-xl bg-slate-900 flex items-center justify-center p-0 shadow-sm overflow-hidden border border-slate-800">
+                                <ApplicationLogo className="block h-full w-auto invert brightness-0 scale-110" />
+                            </div>
+                        </div>
+
                         {/* Page title injected from props or just use header */}
                         {header && (
-                            <div className="ml-2 md:ml-0 font-semibold text-slate-800 dark:text-white text-lg sm:text-xl truncate">
+                            <div className="ml-2 md:ml-0 font-semibold text-slate-800 text-lg sm:text-xl truncate">
                                 {header}
                             </div>
                         )}
@@ -79,7 +87,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <span className="inline-flex rounded-md cursor-pointer">
                                         <button
                                             type="button"
-                                            className="inline-flex items-center rounded-full bg-white dark:bg-slate-800 p-1 pe-3 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 focus:outline-none transition-colors border border-slate-200 dark:border-slate-700 shadow-sm"
+                                            className="inline-flex items-center rounded-full bg-white p-1 pe-3 text-sm font-medium text-slate-600 hover:bg-slate-50 focus:outline-none transition-colors border border-slate-200 shadow-sm"
                                         >
                                             <div className="h-8 w-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold mr-2 text-xs">
                                                 {user.name.charAt(0)}
@@ -98,7 +106,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <p className="text-sm leading-5 text-gray-900">{user.name}</p>
                                         <p className="text-xs leading-5 text-gray-500 truncate">{user.email}</p>
                                     </div>
-                                    <Dropdown.Link href={route('profile.edit')}>Profile Settings</Dropdown.Link>
+                                    <Dropdown.Link href={route('profile.edit', { slug: user.slug })}>Profile Settings</Dropdown.Link>
                                     <Dropdown.Link href={route('logout')} method="post" as="button">Log Out</Dropdown.Link>
                                 </Dropdown.Content>
                             </Dropdown>
@@ -114,7 +122,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     ></div>
                 )}
 
-                <main className="flex-1 overflow-y-auto w-full relative bg-slate-50 dark:bg-slate-950 pb-10 transition-colors">
+                <main className="flex-1 overflow-y-auto w-full relative bg-slate-50 pb-10 transition-colors">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         {children}
                     </div>

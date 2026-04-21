@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'identity' => \App\Http\Middleware\HardenIdentitySlug::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

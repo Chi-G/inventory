@@ -10,6 +10,8 @@ class SupplierController extends Controller
 {
     public function index()
     {
+        $this->authorize('suppliers.view');
+        
         return Inertia::render('Catalog/Suppliers/Index', [
             'suppliers' => Supplier::all()
         ]);
@@ -17,6 +19,8 @@ class SupplierController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('suppliers.create');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'contact_person' => 'nullable|string|max:255',
@@ -31,6 +35,8 @@ class SupplierController extends Controller
 
     public function update(Request $request, Supplier $supplier)
     {
+        $this->authorize('suppliers.edit');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'contact_person' => 'nullable|string|max:255',
@@ -45,6 +51,8 @@ class SupplierController extends Controller
 
     public function destroy(Supplier $supplier)
     {
+        $this->authorize('suppliers.delete');
+
         $supplier->delete();
 
         return redirect()->back()->with('success', 'Supplier deleted successfully.');

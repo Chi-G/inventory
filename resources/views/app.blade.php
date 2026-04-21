@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="icon" type="image/x-icon" href="/favicon.ico">
+        <link rel="icon" type="image/x-icon" href="{{ config('app.env') === 'production' ? config('app.url') . '/favicon.ico' : '/favicon.ico' }}">
 
         <title inertia>{{ config('app.name', 'Elevate Interiors') }}</title>
 
@@ -13,6 +13,15 @@
 
         <!-- Scripts -->
         @routes
+        <script>
+            window.Ziggy = {
+                ...window.Ziggy,
+                defaults: {
+                    ...(window.Ziggy?.defaults || {}),
+                    slug: '{{ auth()->user()?->slug }}'
+                }
+            };
+        </script>
         @viteReactRefresh
         @vite(['resources/js/app.jsx', "resources/js/Pages/{$page['component']}.jsx"])
         @inertiaHead

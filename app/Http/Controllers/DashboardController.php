@@ -12,25 +12,18 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // 1. Core KPIs
         $totalProducts = Product::count();
         
-        // Total Value: SUM(movements.quantity * products.retail_price)
-        $totalValue = DB::table('stock_movements')
-            ->join('products', 'stock_movements.product_id', '=', 'products.id')
-            ->select(DB::raw('SUM(stock_movements.quantity * products.retail_price) as total_value'))
+        // Total Value: SUM(current_stock * retail_price)
+        $totalValue = Product::selectRaw('SUM(current_stock * retail_price) as total_value')
             ->first()
             ->total_value ?? 0;
-
-        // Low Stock Count: Products where SUM(movements.quantity) <= alert_threshold
-        // Using leftJoin to include products with no movements (stock = 0)
-        $lowStockCount = Product::select('products.id')
-            ->leftJoin('stock_movements', 'products.id', '=', 'stock_movements.product_id')
-            ->groupBy('products.id', 'products.alert_threshold')
-            ->having(DB::raw('COALESCE(SUM(stock_movements.quantity), 0)'), '<=', DB::raw('products.alert_threshold'))
-            ->get()
+ 
+        // Low Stock Count: Products where current_stock <= alert_threshold
+        $lowStockCount = Product::whereColumn('current_stock', '<=', 'alert_threshold')
             ->count();
 
         $totalSuppliers = Supplier::count();
@@ -41,19 +34,14 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // 3. Stock Status Distribution
-        $productsWithStock = Product::select('products.id', 'products.alert_threshold')
-            ->leftJoin('stock_movements', 'products.id', '=', 'stock_movements.product_id')
-            ->selectRaw('products.id, products.alert_threshold, COALESCE(SUM(stock_movements.quantity), 0) as current_stock')
-            ->groupBy('products.id', 'products.alert_threshold')
-            ->get();
-
+        // 3. Stock Status Distribution (Direct database aggregates for maximum speed)
         $stockStatus = [
-            'out_of_stock' => $productsWithStock->where('current_stock', '<=', 0)->count(),
-            'low_stock' => $productsWithStock->filter(function($p) {
-                return $p->current_stock > 0 && $p->current_stock <= $p->alert_threshold;
-            })->count(),
-            'healthy' => $productsWithStock->where('current_stock', '>', 'alert_threshold')->count(),
+            'out_of_stock' => Product::where('current_stock', '<=', 0)->count(),
+            'low_stock' => Product::where('current_stock', '>', 0)
+                ->whereColumn('current_stock', '<=', 'alert_threshold')
+                ->count(),
+            'healthy' => Product::whereColumn('current_stock', '>', 'alert_threshold')
+                ->count(),
         ];
 
         // 4. Trends (Last 30 Days)
@@ -83,6 +71,7 @@ class DashboardController extends Controller
                 'low_stock_count' => $lowStockCount,
                 'total_suppliers' => $totalSuppliers,
                 'total_users' => User::count(),
+                'user_slug' => $request->user()->slug,
             ],
             'recentMovements' => $recentMovements,
             'stockStatus' => $stockStatus,

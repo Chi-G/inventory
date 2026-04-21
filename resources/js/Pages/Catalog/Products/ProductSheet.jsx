@@ -13,26 +13,26 @@ export default function ProductSheet({ product }) {
     }, []);
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 md:p-12">
+        <div className="min-h-screen bg-slate-50 p-4 md:p-12">
             <Head title={`Product Information Sheet: ${product.sku}`} />
             
-            <div className="max-w-4xl mx-auto no-print mb-8 flex justify-between items-center bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div className="max-w-4xl mx-auto no-print mb-8 flex justify-between items-center bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Print Preview</h2>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Professional product datasheet optimized for A4/Letter sheets.</p>
+                    <h2 className="text-2xl font-bold text-slate-800">Print Preview</h2>
+                    <p className="text-slate-500 font-medium mt-1">Professional product datasheet optimized for A4/Letter sheets.</p>
                 </div>
                 
                 <div className="flex gap-4">
                     <button 
                         onClick={() => window.print()}
-                        className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 dark:shadow-none hover:bg-indigo-700 transition-all flex items-center gap-2"
+                        className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all flex items-center gap-2"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                         Print Document
                     </button>
                     <button 
                         onClick={() => window.close()}
-                        className="px-6 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-600 transition-all"
+                        className="px-6 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all"
                     >
                         Close
                     </button>

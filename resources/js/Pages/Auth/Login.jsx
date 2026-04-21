@@ -28,9 +28,9 @@ export default function Login({ status, canResetPassword }) {
         <GuestLayout>
             <Head title="Log in" />
 
-            <div className="mb-10">
-                <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-2">Welcome Back.</h1>
-                <p className="text-slate-500 font-medium">Sign in to manage your inventory and operations.</p>
+            <div className="mb-6">
+                <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 mb-1">Welcome Back.</h1>
+                <p className="text-slate-500 text-sm font-medium">Sign in to manage your inventory and operations.</p>
             </div>
 
             {status && (
@@ -39,7 +39,7 @@ export default function Login({ status, canResetPassword }) {
                 </div>
             )}
 
-            <form onSubmit={submit} className="space-y-6">
+            <form onSubmit={submit} className="space-y-4">
                 <div>
                     <InputLabel htmlFor="email" value="Email Address" className="text-slate-700 font-semibold mb-1" />
 
@@ -48,7 +48,7 @@ export default function Login({ status, canResetPassword }) {
                         type="email"
                         name="email"
                         value={data.email}
-                        className="mt-1 block w-full rounded-lg border-slate-200 bg-slate-50 shadow-sm focus:border-slate-800 focus:bg-white focus:ring-slate-800 transition-all py-3 px-4 text-slate-900"
+                        className="mt-1 block w-full rounded-lg border-slate-200 bg-slate-50 shadow-sm focus:border-slate-800 focus:bg-white focus:ring-slate-800 transition-all py-2.5 px-4 text-slate-900"
                         autoComplete="username"
                         isFocused={true}
                         placeholder="admin@elevate.com"
@@ -78,7 +78,7 @@ export default function Login({ status, canResetPassword }) {
                             type={showPassword ? "text" : "password"}
                             name="password"
                             value={data.password}
-                            className="mt-1 block w-full rounded-lg border-slate-200 bg-slate-50 shadow-sm focus:border-slate-800 focus:bg-white focus:ring-slate-800 transition-all py-3 pl-4 pr-12 text-slate-900"
+                            className="mt-1 block w-full rounded-lg border-slate-200 bg-slate-50 shadow-sm focus:border-slate-800 focus:bg-white focus:ring-slate-800 transition-all py-2.5 pl-4 pr-12 text-slate-900"
                             autoComplete="current-password"
                             placeholder="••••••••"
                             onChange={(e) => setData('password', e.target.value)}
@@ -109,13 +109,13 @@ export default function Login({ status, canResetPassword }) {
                     </label>
                 </div>
 
-                <div className="pt-4">
-                    <PrimaryButton className="w-full justify-center bg-slate-900 hover:bg-slate-800 text-white rounded-lg py-3.5 font-bold tracking-wide transition-all shadow-md hover:shadow-lg focus:ring-offset-2 focus:ring-slate-900 text-base" disabled={processing}>
+                <div className="pt-2">
+                    <PrimaryButton className="w-full justify-center bg-slate-900 hover:bg-slate-800 text-white rounded-lg py-3 font-bold tracking-wide transition-all shadow-md hover:shadow-lg focus:ring-offset-2 focus:ring-slate-900 text-base" disabled={processing}>
                         Access System
                     </PrimaryButton>
                 </div>
 
-                <p className="text-center text-xs text-slate-400 mt-10 font-medium tracking-wide uppercase">
+                <p className="text-center text-[10px] text-slate-400 mt-6 font-medium tracking-wide uppercase">
                     Elevate Interiors System v1.0
                 </p>
             </form>

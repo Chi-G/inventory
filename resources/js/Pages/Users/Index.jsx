@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
+import { Plus, Edit, Trash2, Mail, User, ShieldCheck, UserCheck, Smartphone } from 'lucide-react';
 import Modal from '@/Components/Modal';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
@@ -12,6 +13,9 @@ import Swal from 'sweetalert2';
 
 export default function Index({ users }) {
     const { auth, flash } = usePage().props;
+    
+    // Core accounts protection is now handled dynamically via Permissions page.
+    const isProtected = (email) => false;
     
     // Modal states
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -96,88 +100,152 @@ export default function Index({ users }) {
         <AuthenticatedLayout header="User Management">
             <Head title="Users" />
 
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
                 <div>
-                    <h3 className="text-xl font-bold text-slate-800">Staff & Users</h3>
-                    <p className="text-sm text-slate-500 mt-1">Manage platform access, roles, and staff details.</p>
+                    <h3 className="text-2xl font-bold text-slate-800">Staff & Users</h3>
+                    <p className="text-slate-500 mt-1">Manage platform access, roles, and staff details.</p>
                 </div>
-                <PrimaryButton onClick={openCreateModal} className="bg-indigo-600 hover:bg-indigo-700 shadow-sm border border-transparent flex items-center h-10">
-                    <svg className="w-5 h-5 mr-1 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    New User
-                </PrimaryButton>
+                {auth.can['users.create'] && (
+                    <PrimaryButton 
+                        onClick={openCreateModal} 
+                        className="w-full md:w-auto h-11 px-6 bg-indigo-600 border-transparent hover:bg-indigo-700 flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95"
+                    >
+                        <Plus className="w-5 h-5" />
+                        New User
+                    </PrimaryButton>
+                )}
             </div>
 
 
 
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-slate-200">
-                        <thead className="bg-slate-50/50">
-                            <tr>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">User</th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Role</th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                                <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-slate-200">
-                            {users.map((u) => (
-                                <tr key={u.id} className="hover:bg-slate-50/50 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center">
-                                            <div className="flex-shrink-0 h-10 w-10">
-                                                <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold border border-slate-200">
-                                                    {u.name.charAt(0)}
-                                                </div>
-                                            </div>
-                                            <div className="ml-4">
-                                                <div className="text-sm font-medium text-slate-900">{u.name}</div>
-                                                <div className="text-sm text-slate-500">{u.email}</div>
-                                            </div>
+            {/* Desktop View - Table */}
+            <div className="hidden md:block bg-white rounded-3xl border border-slate-200 shadow-sm overflow-x-auto text-sm">
+                <table className="w-full text-left border-collapse min-w-[800px] lg:min-w-full">
+                    <thead className="bg-slate-50/50">
+                        <tr>
+                            <th className="px-6 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">User Profile</th>
+                            <th className="px-6 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Role</th>
+                            <th className="px-6 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Status</th>
+                            <th className="px-6 py-5 text-right text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                        {users.map((u) => (
+                            <tr key={u.id} className="hover:bg-slate-50/30 transition-colors group">
+                                <td className="px-6 py-6 whitespace-nowrap">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-12 w-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 font-black text-lg group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+                                            {u.name.charAt(0).toUpperCase()}
                                         </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border ${getRoleBadgeColor(u.role)}`}>
-                                            {u.role}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center">
-                                            <div className="h-2.5 w-2.5 rounded-full bg-green-500 mr-2"></div>
-                                            <span className="text-sm text-slate-600 font-medium">Active</span>
+                                        <div>
+                                            <p className="font-bold text-slate-800 text-base leading-none">{u.name}</p>
+                                            <p className="text-slate-400 font-medium text-xs mt-1">{u.email}</p>
                                         </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button 
-                                            onClick={() => openEditModal(u)}
-                                            className="text-indigo-600 hover:text-indigo-900 mr-4 font-semibold"
-                                        >
-                                            Edit
-                                        </button>
-                                        
-                                        {/* Cannot delete yourself or super admins if you are not super admin */}
-                                        {(auth.user.role === 'Super Admin' || auth.user.role === 'Admin') && auth.user.id !== u.id && u.role !== 'Super Admin' && (
+                                    </div>
+                                </td>
+                                <td className="px-6 py-6">
+                                    <span className={`px-3 py-1 inline-flex text-[10px] font-black uppercase tracking-widest rounded-lg border ${getRoleBadgeColor(u.role)}`}>
+                                        {u.role}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-6 whitespace-nowrap">
+                                    <div className="flex items-center gap-2 text-green-600 font-bold text-xs uppercase tracking-wide">
+                                        <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+                                        Active
+                                    </div>
+                                </td>
+                                <td className="px-6 py-6 text-right">
+                                    <div className="flex justify-end gap-2">
+                                        {auth.can['users.edit'] && (
                                             <button 
-                                                onClick={() => openDeleteModal(u)}
-                                                className="text-red-500 hover:text-red-700 font-semibold"
+                                                onClick={() => !isProtected(u.email) && openEditModal(u)}
+                                                disabled={isProtected(u.email)}
+                                                className={`h-10 w-10 flex items-center justify-center rounded-xl border transition-all ${isProtected(u.email) ? 'bg-slate-50 border-slate-100 text-slate-200' : 'border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50'}`}
+                                                title={isProtected(u.email) ? "Master account cannot be edited." : "Edit User"}
                                             >
-                                                Delete
+                                                <Edit className="w-5 h-5" />
                                             </button>
                                         )}
-                                    </td>
-                                </tr>
-                            ))}
-                            {users.length === 0 && (
-                                <tr>
-                                    <td colSpan="4" className="px-6 py-12 text-center text-slate-500">
-                                        No users found in the system.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                        {auth.can['users.delete'] && auth.user.id !== u.id && u.role !== 'Super Admin' && (
+                                            <button 
+                                                onClick={() => !isProtected(u.email) && openDeleteModal(u)}
+                                                disabled={isProtected(u.email)}
+                                                className={`h-10 w-10 flex items-center justify-center rounded-xl border transition-all ${isProtected(u.email) ? 'bg-slate-50 border-slate-100 text-slate-200' : 'border-slate-200 text-slate-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50'}`}
+                                                title={isProtected(u.email) ? "Master account cannot be deleted." : "Delete User"}
+                                            >
+                                                <Trash2 className="w-5 h-5" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
+
+            {/* Mobile View - Cards */}
+            <div className="md:hidden space-y-4">
+                {users.map((u) => (
+                    <div key={u.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm transition-all active:scale-[0.98]">
+                        <div className="flex justify-between items-start mb-6">
+                            <div className="flex items-center gap-4">
+                                <div className="h-12 w-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 font-black text-lg">
+                                    {u.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <p className="font-bold text-slate-800 text-lg leading-tight">{u.name}</p>
+                                    <span className={`mt-1 px-2.5 py-0.5 inline-flex text-[9px] font-black uppercase tracking-widest rounded-md border ${getRoleBadgeColor(u.role)}`}>
+                                        {u.role}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                {auth.can['users.edit'] && (
+                                    <button 
+                                        onClick={() => !isProtected(u.email) && openEditModal(u)}
+                                        disabled={isProtected(u.email)}
+                                        className={`h-10 w-10 flex items-center justify-center rounded-xl transition-all ${isProtected(u.email) ? 'bg-slate-50 text-slate-200' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'}`}
+                                    >
+                                        <Edit className="w-5 h-5" />
+                                    </button>
+                                )}
+                                {auth.can['users.delete'] && auth.user.id !== u.id && u.role !== 'Super Admin' && (
+                                    <button 
+                                        onClick={() => !isProtected(u.email) && openDeleteModal(u)}
+                                        disabled={isProtected(u.email)}
+                                        className={`h-10 w-10 flex items-center justify-center rounded-xl transition-all ${isProtected(u.email) ? 'bg-slate-50 text-slate-200' : 'bg-red-50 text-red-600 border border-red-100'}`}
+                                    >
+                                        <Trash2 className="w-5 h-5" />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="space-y-3 pt-5 border-t border-slate-50">
+                            <div className="flex items-center text-sm text-slate-600 gap-4 group">
+                                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-indigo-50 group-hover:border-indigo-100 transition-all">
+                                    <Mail className="w-4 h-4 text-slate-400 group-hover:text-indigo-500" />
+                                </div>
+                                <span className="font-medium text-slate-700 truncate">{u.email}</span>
+                            </div>
+                            <div className="flex items-center text-sm text-slate-600 gap-4 group">
+                                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-green-50 group-hover:border-green-100 transition-all">
+                                    <UserCheck className="w-4 h-4 text-green-500" />
+                                </div>
+                                <span className="font-bold text-green-600 tracking-wide uppercase text-xs">Active Status</span>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {users.length === 0 && (
+                <div className="py-20 text-center bg-white rounded-3xl border border-slate-200 shadow-sm">
+                    <User className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+                    <p className="text-slate-400 italic">No users found in the system.</p>
+                </div>
+            )}
 
             {/* Create Modal */}
             <Modal show={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)}>
@@ -258,11 +326,15 @@ export default function Index({ users }) {
                         <TextInput
                             id="edit_email"
                             type="email"
-                            className="mt-1 block w-full"
+                            className={`mt-1 block w-full ${isProtected(selectedUser?.email) ? 'bg-slate-100 italic text-slate-500' : ''}`}
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
                             required
+                            disabled={isProtected(selectedUser?.email)}
                         />
+                        {isProtected(selectedUser?.email) && (
+                            <p className="mt-1 text-[10px] text-amber-600 font-medium tracking-tight uppercase">Master account email cannot be changed</p>
+                        )}
                         <InputError className="mt-2" message={errors.email} />
                     </div>
 

@@ -12,7 +12,7 @@ import Dropdown from '@/Components/Dropdown';
 import Swal from 'sweetalert2';
 
 export default function Index({ products, categories, suppliers, filters }) {
-    const { flash } = usePage().props;
+    const { auth, flash } = usePage().props;
     const [search, setSearch] = useState(filters.search || '');
     const [parentCategoryId, setParentCategoryId] = useState(filters.parent_category_id || '');
     const [categoryId, setCategoryId] = useState(filters.category_id || '');
@@ -34,7 +34,7 @@ export default function Index({ products, categories, suppliers, filters }) {
     // Debounced search
     useEffect(() => {
         const timer = setTimeout(() => {
-            router.get(route('products.index'), { search, parent_category_id: parentCategoryId, category_id: categoryId }, {
+            router.get(route('products.index', { slug: auth.user.slug }), { search, parent_category_id: parentCategoryId, category_id: categoryId }, {
                 preserveState: true,
                 preserveScroll: true,
                 replace: true
@@ -54,7 +54,7 @@ export default function Index({ products, categories, suppliers, filters }) {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(route('products.destroy', id));
+                router.delete(route('products.destroy', { id, slug: auth.user.slug }));
             }
         });
     };
@@ -76,7 +76,7 @@ export default function Index({ products, categories, suppliers, filters }) {
 
     const submitAdjustment = (e) => {
         e.preventDefault();
-        post(route('products.stock', selectedProduct.id), {
+        post(route('products.stock', { product: selectedProduct.id, slug: auth.user.slug }), {
             preserveScroll: true,
             onSuccess: () => closeAdjustModal(),
         });
@@ -92,19 +92,23 @@ export default function Index({ products, categories, suppliers, filters }) {
                     <p className="text-slate-500 mt-1">Manage physical stock, barcodes, and product details.</p>
                 </div>
                 <div className="flex gap-3">
-                    <a 
-                        href={route('products.export')} 
-                        className="h-11 px-6 bg-white text-slate-700 border border-slate-200 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
-                    >
-                        <Download className="w-5 h-5 text-slate-400" />
-                        Export CSV
-                    </a>
-                    <Link href={route('products.create')}>
-                        <PrimaryButton className="h-11 px-6 bg-indigo-600 hover:bg-indigo-700 flex items-center gap-2 shadow-sm border-transparent transition-all hover:scale-[1.02]">
-                            <Plus className="w-5 h-5" />
-                            Add Product
-                        </PrimaryButton>
-                    </Link>
+                    {auth.can['products.export'] && (
+                        <a 
+                            href={route('products.export', { slug: usePage().props.auth.user.slug })} 
+                            className="h-11 px-6 bg-white text-slate-700 border border-slate-200 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
+                        >
+                            <Download className="w-5 h-5 text-slate-400" />
+                            Export CSV
+                        </a>
+                    )}
+                    {auth.can['products.create'] && (
+                        <Link href={route('products.create', { slug: auth.user.slug })}>
+                            <PrimaryButton className="h-11 px-6 bg-indigo-600 hover:bg-indigo-700 flex items-center gap-2 shadow-sm border-transparent transition-all hover:scale-[1.02]">
+                                <Plus className="w-5 h-5" />
+                                Add Product
+                            </PrimaryButton>
+                        </Link>
+                    )}
                 </div>
             </div>
 
@@ -161,7 +165,9 @@ export default function Index({ products, categories, suppliers, filters }) {
                                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Category</th>
                                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">SKU / Barcode</th>
                                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Retail Price</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Actions</th>
+                                {(auth.can['products.edit'] || auth.can['products.delete'] || auth.can['products.barcode'] || auth.can['inventory.adjust']) && (
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Actions</th>
+                                )}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -215,43 +221,53 @@ export default function Index({ products, categories, suppliers, filters }) {
                                             )}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-5 text-right">
-                                        <div className="flex justify-end gap-1">
-                                            <Link 
-                                                href={route('products.edit', product.id)}
-                                                className="h-9 w-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
-                                            >
-                                                <Edit2 className="w-4 h-4" />
-                                            </Link>
-                                            <Dropdown>
-                                                <Dropdown.Trigger>
-                                                    <button className="h-9 w-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all">
-                                                        <MoreVertical className="w-4 h-4" />
-                                                    </button>
-                                                </Dropdown.Trigger>
-                                                <Dropdown.Content width="40">
-                                                    <button 
-                                                        onClick={() => window.open(route('products.print', product.id), '_blank')}
-                                                        className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-2"
+                                    {(auth.can['products.edit'] || auth.can['products.delete'] || auth.can['products.barcode'] || auth.can['inventory.adjust']) && (
+                                        <td className="px-6 py-5 text-right">
+                                            <div className="flex justify-end gap-1">
+                                                {auth.can['products.edit'] && (
+                                                    <Link 
+                                                        href={route('products.edit', { product: product.id, slug: auth.user.slug })}
+                                                        className="h-9 w-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
                                                     >
-                                                        <Printer className="w-4 h-4" /> Print Label
-                                                    </button>
-                                                    <button 
-                                                        onClick={() => openAdjustModal(product)}
-                                                        className="w-full text-left px-4 py-2 text-sm text-indigo-600 hover:bg-slate-50 flex items-center gap-2"
-                                                    >
-                                                        <RefreshCcw className="w-4 h-4" /> Adjust Stock
-                                                    </button>
-                                                    <button 
-                                                        onClick={() => handleDelete(product.id)}
-                                                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" /> Delete
-                                                    </button>
-                                                </Dropdown.Content>
-                                            </Dropdown>
-                                        </div>
-                                    </td>
+                                                        <Edit2 className="w-4 h-4" />
+                                                    </Link>
+                                                )}
+                                                <Dropdown>
+                                                    <Dropdown.Trigger>
+                                                        <button className="h-9 w-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all">
+                                                            <MoreVertical className="w-4 h-4" />
+                                                        </button>
+                                                    </Dropdown.Trigger>
+                                                    <Dropdown.Content width="40">
+                                                        {auth.can['products.barcode'] && (
+                                                            <button 
+                                                                onClick={() => window.open(route('products.print', { product: product.id, slug: auth.user.slug }), '_blank')}
+                                                                className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-2"
+                                                            >
+                                                                <Printer className="w-4 h-4" /> Print Label
+                                                            </button>
+                                                        )}
+                                                        {auth.can['inventory.adjust'] && (
+                                                            <button 
+                                                                onClick={() => openAdjustModal(product)}
+                                                                className="w-full text-left px-4 py-2 text-sm text-indigo-600 hover:bg-slate-50 flex items-center gap-2"
+                                                            >
+                                                                <RefreshCcw className="w-4 h-4" /> Adjust Stock
+                                                            </button>
+                                                        )}
+                                                        {auth.can['products.delete'] && (
+                                                            <button 
+                                                                onClick={() => handleDelete(product.id)}
+                                                                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" /> Delete
+                                                            </button>
+                                                        )}
+                                                    </Dropdown.Content>
+                                                </Dropdown>
+                                            </div>
+                                        </td>
+                                    )}
                                 </tr>
                             ))}
                             {products.data.length === 0 && (

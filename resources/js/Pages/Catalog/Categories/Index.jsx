@@ -12,7 +12,7 @@ import { router } from '@inertiajs/react';
 import Swal from 'sweetalert2';
 
 export default function Index({ categories, parentCategories }) {
-    const { flash } = usePage().props;
+    const { auth, flash } = usePage().props;
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -42,7 +42,7 @@ export default function Index({ categories, parentCategories }) {
 
     const handleCreate = (e) => {
         e.preventDefault();
-        post(route('categories.store'), {
+        post(route('categories.store', { slug: auth.user.slug }), {
             onSuccess: () => {
                 setIsCreateModalOpen(false);
                 reset();
@@ -52,7 +52,7 @@ export default function Index({ categories, parentCategories }) {
 
     const handleEdit = (e) => {
         e.preventDefault();
-        put(route('categories.update', selectedCategory.id), {
+        put(route('categories.update', { category: selectedCategory.id, slug: auth.user.slug }), {
             onSuccess: () => {
                 setIsEditModalOpen(false);
                 reset();
@@ -72,7 +72,7 @@ export default function Index({ categories, parentCategories }) {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(route('categories.destroy', id));
+                router.delete(route('categories.destroy', { id, slug: auth.user.slug }));
             }
         });
     };
@@ -81,24 +81,33 @@ export default function Index({ categories, parentCategories }) {
         <AuthenticatedLayout header="Categories">
             <Head title="Categories" />
 
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-800">Product Categories</h1>
                     <p className="text-slate-500 mt-1">Organize your interior inventory by type and style.</p>
                 </div>
-                <PrimaryButton onClick={openCreateModal} className="h-11 px-6 bg-indigo-600 hover:bg-indigo-700 flex items-center gap-2">
-                    <Plus className="w-5 h-5" />
-                    New Category
-                </PrimaryButton>
+                {auth.can['categories.create'] && (
+                    <div className="flex-shrink-0">
+                        <PrimaryButton 
+                            onClick={openCreateModal} 
+                            className="w-full md:w-auto h-11 px-6 bg-indigo-600 hover:bg-indigo-700 flex items-center justify-center gap-2"
+                        >
+                            <Plus className="w-5 h-5" />
+                            New Category
+                        </PrimaryButton>
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {categories.data.map((category) => (
                     <div key={category.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all group overflow-hidden relative">
                          <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                            <button onClick={() => openEditModal(category)} className="p-2 bg-slate-50 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg border border-slate-100 transition-colors">
-                                <Edit className="w-4 h-4" />
-                            </button>
+                            {auth.can['categories.edit'] && (
+                                <button onClick={() => openEditModal(category)} className="p-2 bg-slate-50 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg border border-slate-100 transition-colors">
+                                    <Edit className="w-4 h-4" />
+                                </button>
+                            )}
                          </div>
                         
                         <div className="flex items-center gap-2 mb-4">
@@ -221,29 +230,31 @@ export default function Index({ categories, parentCategories }) {
                 <form onSubmit={handleEdit} className="p-8">
                     <div className="flex justify-between items-start mb-6">
                         <h2 className="text-xl font-bold text-slate-900">Edit Category</h2>
-                        <button 
-                            type="button"
-                            onClick={() => {
-                                Swal.fire({
-                                    title: 'Are you sure?',
-                                    text: "This category will be permanently deleted!",
-                                    icon: 'warning',
-                                    showCancelButton: true,
-                                    confirmButtonColor: '#4f46e5',
-                                    cancelButtonColor: '#ef4444',
-                                    confirmButtonText: 'Yes, delete it!'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        router.delete(route('categories.destroy', selectedCategory.id), {
-                                            onSuccess: () => setIsEditModalOpen(false)
-                                        });
-                                    }
-                                });
-                            }}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                        >
-                            <Trash2 className="w-5 h-5" />
-                        </button>
+                        {auth.can['categories.delete'] && (
+                            <button 
+                                type="button"
+                                onClick={() => {
+                                    Swal.fire({
+                                        title: 'Are you sure?',
+                                        text: "This category will be permanently deleted!",
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#4f46e5',
+                                        cancelButtonColor: '#ef4444',
+                                        confirmButtonText: 'Yes, delete it!'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            router.delete(route('categories.destroy', { id: selectedCategory.id, slug: auth.user.slug }), {
+                                                onSuccess: () => setIsEditModalOpen(false)
+                                            });
+                                        }
+                                    });
+                                }}
+                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                                <Trash2 className="w-5 h-5" />
+                            </button>
+                        )}
                     </div>
                     
                     <div className="space-y-5">

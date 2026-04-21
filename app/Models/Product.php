@@ -18,6 +18,7 @@ class Product extends Model
         'barcode_symbology',
         'attributes',
         'alert_threshold',
+        'current_stock',
     ];
 
     protected $casts = [
@@ -26,7 +27,7 @@ class Product extends Model
         'retail_price' => 'float',
     ];
 
-    protected $appends = ['current_stock'];
+// Removed current_stock append to favor real DB column
 
     public function category()
     {
@@ -38,10 +39,7 @@ class Product extends Model
         return $this->hasMany(StockMovement::class);
     }
 
-    public function getCurrentStockAttribute()
-    {
-        return $this->stockMovements()->sum('quantity');
-    }
+    // Removed getCurrentStockAttribute to favor direct column access for performance
 
     /**
      * Helper to perform a stock adjustment and generate a movement record.
