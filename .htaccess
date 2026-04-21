@@ -1,12 +1,13 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # 1. First, try to serve existing assets from the public folder
+    # 1. Handle existing files in the public directory
+    RewriteCond %{REQUEST_URI} !^/public/
     RewriteCond %{DOCUMENT_ROOT}/inventory/public/$1 -f
     RewriteRule ^(.*)$ public/$1 [L]
 
-    # 2. Redirect everything else to our NEW root index.php
+    # 2. Redirect all other requests to public/index.php
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.php [L]
+    RewriteRule ^(.*)$ public/index.php [L]
 </IfModule>
