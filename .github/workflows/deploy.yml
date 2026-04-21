@@ -3,12 +3,10 @@ name: Verified Production Deployment
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
-  test-build:
-    name: Build Verification
+  deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -33,36 +31,41 @@ jobs:
     - name: Run Build
       run: npm run build
 
-  deploy:
-    name: Deploy to Production
-    needs: test-build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Deploy to Hostinger via SSH
+    - name: Upload code via SSH (Sync repository)
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.PORT }}
-        timeout: 60s
-        command_timeout: 30m
         script: |
-          # Debug: Ensure token is present (will print 'present' or 'missing')
-          if [ -z "${{ secrets.GITHUB_API_TOKEN }}" ]; then echo "TOKEN MISSING"; else echo "TOKEN OK"; fi
-          
           cd /home/u157985566/domains/forahia.com/public_html/inventory || mkdir -p /home/u157985566/domains/forahia.com/public_html/inventory && cd /home/u157985566/domains/forahia.com/public_html/inventory
           if [ ! -d ".git" ]; then
-            echo "Initializing Git repository in existing folder..."
             git init
             git remote add origin https://${{ secrets.GITHUB_API_TOKEN }}@github.com/Chi-G/inventory.git
-            git fetch origin main
-            git reset --hard origin/main
-          else
-            echo "Updating existing repository..."
-            git pull origin main
           fi
+          git fetch origin main
+          git reset --hard origin/main
+          mkdir -p public/build
+
+    - name: Copy Build Assets via SCP
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.PORT }}
+        source: "public/build/*"
+        target: "/home/u157985566/domains/forahia.com/public_html/inventory/public/build/"
+        strip_components: 2
+
+    - name: Run Post-Deployment Tasks
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+          cd /home/u157985566/domains/forahia.com/public_html/inventory
           bash deploy.sh

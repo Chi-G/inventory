@@ -3,33 +3,29 @@
 # Elevate Interiors - Production Deployment Script
 # Target: forahia.com/inventory
 
-echo "🚀 Starting Deployment for Elevate Interiors..."
+echo "🚀 Starting Post-Deployment Tasks..."
 
-# 1. Update CodeBase
-echo "📥 Pulling latest changes from GitHub..."
-git pull origin main
-
-# 2. Backend Dependencies
-echo "📦 Installing PHP dependencies..."
+# 1. Backend Dependencies
+echo "📦 Optimizing PHP dependencies..."
 composer install --optimize-autoloader --no-dev
 
-# 3. Frontend Assets
-echo "🎨 Building assets for subdirectory (/inventory)..."
-npm install
-npm run build
-
-# 4. Database Optimization
+# 2. Database Tasks
 echo "🗄️ Running migrations..."
 php artisan migrate --force
 
-# 5. Optimization
+# 3. Optimization
 echo "⚡ Optimizing caches..."
+# Clear caches first to ensure fresh state
+php artisan optimize:clear
+# Rebuild caches
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# 6. Storage
+# 4. Storage
 echo "🔗 Ensuring storage link exists..."
-php artisan storage:link
+if [ ! -L public/storage ]; then
+    php artisan storage:link
+fi
 
-echo "✅ Deployment Successful! Visit https://forahia.com/inventory"
+echo "✅ Post-Deployment Tasks Successful!"
