@@ -29,6 +29,9 @@ rm -f bootstrap/cache/packages.php
 # 3. Clear and cache config
 # Clear caches first to ensure fresh state
 php artisan optimize:clear
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
 # Rebuild caches
 php artisan config:cache
 php artisan route:cache
