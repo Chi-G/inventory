@@ -2,11 +2,10 @@
     RewriteEngine On
 
     # 1. First, try to serve existing assets from the public folder
-    RewriteCond %{REQUEST_URI} !^/public/
     RewriteCond %{DOCUMENT_ROOT}/inventory/public/$1 -f
     RewriteRule ^(.*)$ public/$1 [L]
 
-    # 2. Redirect everything else (API, routes) to our root proxy index.php
+    # 2. Redirect everything else to our NEW root index.php
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^ index.php [L]

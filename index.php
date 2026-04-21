@@ -1,9 +1,21 @@
 <?php
 
-/**
- * Laravel Subdirectory Proxy for Hostinger
- * This file allows the application to run from the root of the /inventory/ folder
- * while keeping the core logic secure inside /public/ and /app/
- */
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 
-require __DIR__.'/public/index.php';
+define('LARAVEL_START', microtime(true));
+
+// 1. Maintenance Mode
+if (file_exists($maintenance = __DIR__.'/storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
+// 2. Autoloader (Fixed path: no longer using ../)
+require __DIR__.'/vendor/autoload.php';
+
+// 3. Bootstrap (Fixed path: no longer using ../)
+/** @var Application $app */
+$app = require_once __DIR__.'/bootstrap/app.php';
+
+// 4. Handle Request
+$app->handleRequest(Request::capture());
