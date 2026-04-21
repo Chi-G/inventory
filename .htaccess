@@ -2,13 +2,14 @@
     RewriteEngine On
     RewriteBase /inventory/
 
-    # 1. First, try to serve existing assets from the public folder
-    RewriteCond %{REQUEST_FILENAME} !-f
+    # Handle Static Files
+    RewriteCond %{REQUEST_URI} !^/public/
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^((?!public/).*)$ public/$1 [L,QSA]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ public/$1 [L]
 
-    # 2. Redirect everything else to the public/index.php entry point
-    RewriteCond %{REQUEST_FILENAME} !-f
+    # Handle Front Controller
     RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ public/index.php [L,QSA]
 </IfModule>

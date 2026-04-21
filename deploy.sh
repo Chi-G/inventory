@@ -19,6 +19,13 @@ echo "⚡ Optimizing caches..."
 sed -i 's|APP_URL=.*|APP_URL=https://forahia.com/inventory|g' .env
 sed -i 's|ASSET_URL=.*|ASSET_URL=https://forahia.com/inventory|g' .env
 
+# --- NUCLEAR CACHE CLEAR ---
+echo "🧨 Nuclear Cache Clear..."
+rm -f bootstrap/cache/config.php
+rm -f bootstrap/cache/routes.php
+rm -f bootstrap/cache/services.php
+rm -f bootstrap/cache/packages.php
+
 # 3. Clear and cache config
 # Clear caches first to ensure fresh state
 php artisan optimize:clear

@@ -13,14 +13,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        if (config('app.env') === 'production') {
-            // FORCE the Application URL to fix Hostinger subdirectory issues
-            config(['app.url' => 'https://forahia.com/inventory']);
+        if (config('app.env') === 'production' || env('APP_ENV') === 'production') {
+            // FORCE the Application URL at the very beginning of the lifecycle
+            $url = 'https://forahia.com/inventory';
+            config(['app.url' => $url]);
             
-            // Re-bind the public path explicitly
+            // Register the public path explicitly
             $this->app->bind('path.public', function() {
                 return base_path('public');
             });
+
+            // Force the root URL immediately for early-loading providers
+            URL::forceRootUrl($url);
+            URL::forceScheme('https');
         }
     }
 
@@ -31,12 +36,12 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
-        if (config('app.env') === 'production') {
+        if (config('app.env') === 'production' || env('APP_ENV') === 'production') {
             $url = 'https://forahia.com/inventory';
 
-            // Force Scheme and Root URL for all generated links
-            URL::forceScheme('https');
+            // Ensure all generated URLs use the subdirectory path
             URL::forceRootUrl($url);
+            URL::forceScheme('https');
             
             // Force Vite Asset URL
             putenv("VITE_ASSET_URL=$url");
