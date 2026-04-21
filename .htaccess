@@ -1,17 +1,17 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # 1. Handle Static Files: If it exists in public/, serve it from there
-    # (Checking for the file inside the public subdirectory)
+    # 1. First, try to serve existing assets from the public folder
+    RewriteCond %{REQUEST_URI} !^/inventory/public/
     RewriteCond %{DOCUMENT_ROOT}/inventory/public/$1 -f
     RewriteRule ^(.*)$ public/$1 [L]
 
-    # 2. Handle Laravel Routes: Everything else goes to the index.php
-    # We explicitly point to public/index.php
+    # 2. Redirect everything else to the public/index.php entry point
+    # We use a leading slash for the target to be explicit for LiteSpeed
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ public/index.php [L,QSA]
+    RewriteRule ^(.*)$ /inventory/public/index.php [L,QSA]
 
     # 3. Handle Root Access
-    RewriteRule ^$ public/index.php [L,QSA]
+    RewriteRule ^$ /inventory/public/index.php [L,QSA]
 </IfModule>
