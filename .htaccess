@@ -1,13 +1,5 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-
-    # 1. Handle existing files in the public directory
-    RewriteCond %{REQUEST_URI} !^/public/
-    RewriteCond %{DOCUMENT_ROOT}/inventory/public/$1 -f
+    RewriteBase /inventory/
     RewriteRule ^(.*)$ public/$1 [L]
-
-    # 2. Redirect all other requests to public/index.php
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ public/index.php [L]
 </IfModule>
