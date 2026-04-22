@@ -16,20 +16,6 @@ use Illuminate\Support\Facades\Artisan;
 Route::any('/', function () {
     return redirect()->route('login');
 });
-// One-time fix for missing permissions in production
-Route::any('/debug-files', function() {
-    $publicPath = public_path();
-    $file = $publicPath . '/brand-logo.png';
-    return response()->json([
-        'path' => $file,
-        'exists' => file_exists($file),
-        'readable' => is_readable($file),
-        'perms' => file_exists($file) ? substr(sprintf('%o', fileperms($file)), -4) : null,
-        'size' => file_exists($file) ? filesize($file) : null,
-        'owner' => file_exists($file) ? posix_getpwuid(fileowner($file))['name'] : null,
-    ]);
-});
-
 // Standard Auth Routes (Login, etc.)
 require __DIR__.'/auth.php';
 
