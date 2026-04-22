@@ -1,13 +1,13 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { 
-    Box, 
-    ArrowUpRight, 
-    ArrowDownRight, 
-    AlertTriangle, 
-    DollarSign, 
-    TrendingUp, 
-    Package, 
+import {
+    Box,
+    ArrowUpRight,
+    ArrowDownRight,
+    AlertTriangle,
+    DollarSign,
+    TrendingUp,
+    Package,
     History,
     ChevronRight,
     Search,
@@ -15,50 +15,50 @@ import {
     Users
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { 
-    AreaChart, 
-    Area, 
-    XAxis, 
-    YAxis, 
-    CartesianGrid, 
-    Tooltip, 
-    ResponsiveContainer 
+import {
+    AreaChart,
+    Area,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer
 } from 'recharts';
 
 export default function Dashboard({ stats, recentMovements, stockStatus, trends }) {
     const kpis = [
-        { 
-            name: 'Total Products', 
-            value: stats.total_products, 
-            icon: Box, 
-            color: 'text-indigo-600', 
+        {
+            name: 'Total Products',
+            value: stats.total_products,
+            icon: Box,
+            color: 'text-indigo-600',
             bg: 'bg-indigo-50',
             borderColor: 'border-indigo-100',
             description: 'Unique catalog entries'
         },
-        { 
-            name: 'Inventory Value', 
-            value: `₦${stats.inventory_value.toLocaleString()}`, 
-            icon: DollarSign, 
-            color: 'text-emerald-600', 
+        {
+            name: 'Inventory Value',
+            value: `₦${stats.inventory_value.toLocaleString()}`,
+            icon: DollarSign,
+            color: 'text-emerald-600',
             bg: 'bg-emerald-50',
             borderColor: 'border-emerald-100',
             description: 'Based on retail price'
         },
-        { 
-            name: 'Low Stock Alert', 
-            value: stats.low_stock_count, 
-            icon: AlertTriangle, 
-            color: 'text-amber-600', 
+        {
+            name: 'Low Stock Alert',
+            value: stats.low_stock_count,
+            icon: AlertTriangle,
+            color: 'text-amber-600',
             bg: 'bg-amber-50',
             borderColor: 'border-amber-100',
             description: 'Needs urgent attention'
         },
-        { 
-            name: 'Active Suppliers', 
-            value: stats.total_suppliers, 
-            icon: Truck, 
-            color: 'text-purple-600', 
+        {
+            name: 'Active Suppliers',
+            value: stats.total_suppliers,
+            icon: Truck,
+            color: 'text-purple-600',
             bg: 'bg-purple-50',
             borderColor: 'border-purple-100',
             description: 'Verified partners'
@@ -88,12 +88,12 @@ export default function Dashboard({ stats, recentMovements, stockStatus, trends 
                 {/* Header Welcome */}
                 <div className="flex justify-between items-end">
                     <div>
-                        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Main Dashboard</h1>
+                        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Dashboard</h1>
                         <p className="text-slate-500 mt-1 font-medium">Real-time status of your interior inventory ecosystem.</p>
                     </div>
                     <div className="hidden sm:flex gap-3">
                         {usePage().props.auth.can['scanner.index'] && (
-                            <Link 
+                            <Link
                                 href={route('scanner.index', { slug: usePage().props.auth.user.slug })}
                                 className="h-11 px-6 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-2 hover:bg-indigo-600 transition-all shadow-lg shadow-slate-200"
                             >
@@ -105,15 +105,15 @@ export default function Dashboard({ stats, recentMovements, stockStatus, trends 
                 </div>
 
                 {/* KPI Grid */}
-                <motion.div 
+                <motion.div
                     variants={containerVariants}
                     initial="hidden"
                     animate="show"
                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6"
                 >
                     {kpis.map((kpi, i) => (
-                        <motion.div 
-                            key={i} 
+                        <motion.div
+                            key={i}
                             variants={itemVariants}
                             className={`bg-white p-6 rounded-[2rem] border ${kpi.borderColor} shadow-sm hover:shadow-md transition-all group overflow-hidden`}
                         >
@@ -133,7 +133,7 @@ export default function Dashboard({ stats, recentMovements, stockStatus, trends 
                 </motion.div>
 
                 {/* Trends Chart */}
-                <motion.div 
+                <motion.div
                     variants={itemVariants}
                     initial="hidden"
                     animate="show"
@@ -153,53 +153,53 @@ export default function Dashboard({ stats, recentMovements, stockStatus, trends 
                             <AreaChart data={trends} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="colorIn" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
-                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
+                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                                     </linearGradient>
                                     <linearGradient id="colorOut" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1}/>
-                                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1} />
+                                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis 
-                                    dataKey="date" 
-                                    axisLine={false} 
-                                    tickLine={false} 
+                                <XAxis
+                                    dataKey="date"
+                                    axisLine={false}
+                                    tickLine={false}
                                     tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
                                     dy={10}
                                     interval="preserveStartEnd"
                                 />
-                                <YAxis 
-                                    axisLine={false} 
-                                    tickLine={false} 
+                                <YAxis
+                                    axisLine={false}
+                                    tickLine={false}
                                     tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
                                 />
-                                <Tooltip 
-                                    contentStyle={{ 
-                                        borderRadius: '1rem', 
-                                        border: 'none', 
+                                <Tooltip
+                                    contentStyle={{
+                                        borderRadius: '1rem',
+                                        border: 'none',
                                         boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
                                         fontFamily: 'inherit',
                                         fontWeight: 'bold'
                                     }}
                                 />
-                                <Area 
-                                    type="monotone" 
-                                    dataKey="in" 
-                                    stroke="#10b981" 
+                                <Area
+                                    type="monotone"
+                                    dataKey="in"
+                                    stroke="#10b981"
                                     strokeWidth={3}
-                                    fillOpacity={1} 
-                                    fill="url(#colorIn)" 
+                                    fillOpacity={1}
+                                    fill="url(#colorIn)"
                                     name="Stock In"
                                 />
-                                <Area 
-                                    type="monotone" 
-                                    dataKey="out" 
-                                    stroke="#ef4444" 
+                                <Area
+                                    type="monotone"
+                                    dataKey="out"
+                                    stroke="#ef4444"
                                     strokeWidth={3}
-                                    fillOpacity={1} 
-                                    fill="url(#colorOut)" 
+                                    fillOpacity={1}
+                                    fill="url(#colorOut)"
                                     name="Stock Out"
                                 />
                             </AreaChart>
@@ -259,9 +259,8 @@ export default function Dashboard({ stats, recentMovements, stockStatus, trends 
                                                     </span>
                                                 </td>
                                                 <td className="px-8 py-5">
-                                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                                                        move.type === 'IN' ? 'bg-emerald-50 text-emerald-600' : move.type === 'OUT' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'
-                                                    }`}>
+                                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${move.type === 'IN' ? 'bg-emerald-50 text-emerald-600' : move.type === 'OUT' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'
+                                                        }`}>
                                                         Completed
                                                     </span>
                                                 </td>
@@ -283,7 +282,7 @@ export default function Dashboard({ stats, recentMovements, stockStatus, trends 
                     {/* Stock Health & Summary */}
                     <div className="flex flex-col gap-6">
                         <h2 className="text-xl font-bold text-slate-800 px-2">Stock Health</h2>
-                        
+
                         <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col gap-6 transition-colors">
                             <div className="flex flex-col gap-4">
                                 <div className="flex justify-between items-end">
@@ -291,16 +290,16 @@ export default function Dashboard({ stats, recentMovements, stockStatus, trends 
                                     <span className="text-xs font-black text-indigo-600">{stats.total_products} Skus total</span>
                                 </div>
                                 <div className="h-3 w-full bg-slate-100 rounded-full flex overflow-hidden">
-                                    <div 
-                                        className="h-full bg-emerald-500 transition-all duration-1000" 
+                                    <div
+                                        className="h-full bg-emerald-500 transition-all duration-1000"
                                         style={{ width: `${(stockStatus.healthy / stats.total_products) * 100}%` }}
                                     ></div>
-                                    <div 
-                                        className="h-full bg-amber-500 transition-all duration-1000" 
+                                    <div
+                                        className="h-full bg-amber-500 transition-all duration-1000"
                                         style={{ width: `${(stockStatus.low_stock / stats.total_products) * 100}%` }}
                                     ></div>
-                                    <div 
-                                        className="h-full bg-red-500 transition-all duration-1000" 
+                                    <div
+                                        className="h-full bg-red-500 transition-all duration-1000"
                                         style={{ width: `${(stockStatus.out_of_stock / stats.total_products) * 100}%` }}
                                     ></div>
                                 </div>
