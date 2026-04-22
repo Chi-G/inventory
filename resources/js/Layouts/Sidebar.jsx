@@ -22,7 +22,7 @@ export default function Sidebar({ isOpen, onClose }) {
     return (
         <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 border-r border-slate-800 text-white min-h-screen flex flex-col shrink-0 shadow-xl transition-all duration-300 md:static md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'
             }`}>
-            <div className="h-16 flex items-center px-6 border-b border-slate-800 shrink-0 bg-slate-950/40">
+            <div className="h-16 hidden md:flex items-center px-6 border-b border-slate-800 shrink-0 bg-slate-950/40">
                 <Link href={route('dashboard.index', { slug: user.slug })} className="flex items-center gap-3 group/logo">
                     <div className="h-12 w-12 rounded-xl flex items-center justify-center p-0 shadow-[0_0_20px_rgba(255,255,255,0.1)] ring-2 ring-slate-900 transition-transform group-hover/logo:scale-105 duration-300 overflow-hidden">
                         <ApplicationLogo className="block h-10 w-auto" />

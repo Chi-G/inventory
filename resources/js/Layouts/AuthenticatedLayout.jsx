@@ -77,12 +77,6 @@ export default function AuthenticatedLayout({ header, children }) {
                             </svg>
                         </button>
 
-                        {/* Mobile Logo */}
-                        <div className="md:hidden ml-2 flex items-center gap-2">
-                            <div className="h-11 w-11 rounded-xl bg-slate-900 flex items-center justify-center p-0 shadow-sm overflow-hidden border border-slate-800">
-                                <ApplicationLogo className="block h-full w-auto invert brightness-0 scale-110" />
-                            </div>
-                        </div>
 
                         {/* Page title injected from props or just use header */}
                         {header && (
