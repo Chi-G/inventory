@@ -2,8 +2,11 @@
     RewriteEngine On
     RewriteBase /inventory/
 
+    # Ensure index.php handles directory requests
+    DirectoryIndex index.php
+
     # Handle everything by passing it to index.php
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ index.php [L]
+    RewriteRule ^(.*)$ index.php/$1 [L,QSA]
 </IfModule>
