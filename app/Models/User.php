@@ -61,6 +61,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'access_expires_at' => 'datetime',
+            'can_login_after' => 'datetime',
         ];
     }
 

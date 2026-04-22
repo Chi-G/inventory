@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use Carbon\Carbon;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -54,7 +55,7 @@ class AuthenticatedSessionController extends Controller
         // 2. Set expiry for timed-access user
         if ($request->user()->email === 'drmally@elevate.com') {
             $request->user()->update([
-                'access_expires_at' => \Carbon\Carbon::now()->addHours(\App\Models\User::TIMED_ACCESS_HOURS),
+                'access_expires_at' => Carbon::now()->addHours(\App\Models\User::TIMED_ACCESS_HOURS),
                 'can_login_after' => null, // Clear any previous blocks
             ]);
         }
@@ -73,7 +74,7 @@ class AuthenticatedSessionController extends Controller
         if ($user && $user->email === 'drmally@elevate.com') {
             $user->update([
                 'access_expires_at' => null,
-                'can_login_after' => \Carbon\Carbon::now()->addHours(\App\Models\User::LOCKOUT_HOURS),
+                'can_login_after' => Carbon::now()->addHours(\App\Models\User::LOCKOUT_HOURS),
             ]);
         }
 

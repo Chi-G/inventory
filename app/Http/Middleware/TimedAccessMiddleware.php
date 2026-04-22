@@ -23,6 +23,7 @@ class TimedAccessMiddleware
         if ($user && $user->email === 'drmally@elevate.com') {
             
             // 1. Check if the session has expired (1 hour limit)
+            if ($user->access_expires_at && Carbon::now()->gt($user->access_expires_at)) {
                 // Set the lockout (using configured hours)
                 $user->update([
                     'access_expires_at' => null,

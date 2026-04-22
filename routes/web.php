@@ -13,7 +13,11 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
 // This handles the root of the app (forahia.com/inventory/)
-Route::match(['get', 'post'], '/', function () {
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
+Route::post('/', function () {
     return redirect()->route('login');
 });
 // Standard Auth Routes (Login, etc.)
