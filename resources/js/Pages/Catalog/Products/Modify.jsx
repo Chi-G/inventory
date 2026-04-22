@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState, useRef } from 'react';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
@@ -10,6 +10,7 @@ import { ArrowLeft, Box, Upload, X, HelpCircle, CheckCircle2, Wallet, Tag, PlusC
 
 export default function Modify({ product = null, categories, sku_suggestion = '' }) {
     const isEditing = !!product;
+    const { auth } = usePage().props;
     const [imagePreview, setImagePreview] = useState(product?.image_path ? `/storage/${product.image_path}` : null);
     const fileInputRef = useRef();
 
@@ -81,9 +82,9 @@ export default function Modify({ product = null, categories, sku_suggestion = ''
 
         // Laravel doesn't support native PUT with files, so we POST and spoof the method.
         if (isEditing) {
-            post(route('products.update', { slug, product: product.id }));
+            post(route('products.update', { slug: auth.user.slug, product: product.id }));
         } else {
-            post(route('products.store', { slug }));
+            post(route('products.store', { slug: auth.user.slug }));
         }
     };
 
@@ -93,7 +94,7 @@ export default function Modify({ product = null, categories, sku_suggestion = ''
 
             <div className="mb-8">
                 <Link
-                    href={route('products.index', { slug })}
+                    href={route('products.index', { slug: auth.user.slug })}
                     className="group flex items-center text-slate-500 hover:text-indigo-600 transition-colors text-sm font-medium"
                 >
                     <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
@@ -410,7 +411,7 @@ export default function Modify({ product = null, categories, sku_suggestion = ''
                             </PrimaryButton>
                             <SecondaryButton
                                 type="button"
-                                onClick={() => router.get(route('products.index', { slug }))}
+                                onClick={() => router.get(route('products.index', { slug: auth.user.slug }))}
                                 className="w-full h-12 bg-transparent text-slate-400 border-slate-800 hover:bg-slate-800 flex items-center justify-center text-sm"
                             >
                                 Discard & Exit
