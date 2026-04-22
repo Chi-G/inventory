@@ -176,8 +176,8 @@ export default function Index({ products, categories, suppliers, filters }) {
                                     <td className="px-6 py-5">
                                         <div className="flex items-center gap-4">
                                             <div className="h-14 w-14 rounded-xl border border-slate-100 bg-slate-50 overflow-hidden flex items-center justify-center shrink-0">
-                                                {product.image_path ? (
-                                                    <img src={`/storage/${product.image_path}`} alt={product.name} className="h-full w-full object-cover" />
+                                                {product.image_url ? (
+                                                    <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
                                                 ) : (
                                                     <ImageIcon className="w-6 h-6 text-slate-300" />
                                                 )}

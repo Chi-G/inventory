@@ -166,7 +166,7 @@ class ProductController extends Controller
             'cost_price' => $product->cost_price,
             'category_name' => $product->category?->name,
             'parent_category' => $product->category?->parent?->name,
-            'image_url' => $product->image_path ? Storage::url($product->image_path) : null,
+            'image_url' => $product->image_url,
             'current_stock' => $product->current_stock,
             'alert_threshold' => $product->alert_threshold,
             'attributes' => $product->attributes

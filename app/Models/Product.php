@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -26,6 +27,8 @@ class Product extends Model
         'cost_price' => 'float',
         'retail_price' => 'float',
     ];
+
+    protected $appends = ['image_url'];
 
 // Removed current_stock append to favor real DB column
 
@@ -66,5 +69,13 @@ class Product extends Model
             'user_id' => $userId ?? auth()->id(),
             'supplier_id' => $supplierId,
         ]);
+    }
+
+    /**
+     * Get the full URL for the product image.
+     */
+    public function getImageUrlAttribute()
+    {
+        return $this->image_path ? Storage::url($this->image_path) : null;
     }
 }

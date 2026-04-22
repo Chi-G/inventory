@@ -11,7 +11,7 @@ import { ArrowLeft, Box, Upload, X, HelpCircle, CheckCircle2, Wallet, Tag, PlusC
 export default function Modify({ product = null, categories, sku_suggestion = '' }) {
     const isEditing = !!product;
     const { auth } = usePage().props;
-    const [imagePreview, setImagePreview] = useState(product?.image_path ? `/storage/${product.image_path}` : null);
+    const [imagePreview, setImagePreview] = useState(product?.image_url || null);
     const fileInputRef = useRef();
 
     // Hierarchy state

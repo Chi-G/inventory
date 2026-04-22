@@ -93,8 +93,8 @@ export default function ProductSheet({ product }) {
                     </div>
 
                     <div className="flex justify-center items-center bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 p-8">
-                        {product.image_path ? (
-                            <img src={`/storage/${product.image_path}`} alt={product.name} className="max-h-[250px] w-auto object-contain rounded-xl" />
+                        {product.image_url ? (
+                            <img src={product.image_url} alt={product.name} className="max-h-[250px] w-auto object-contain rounded-xl" />
                         ) : (
                             <div className="text-center">
                                 <Box className="w-20 h-20 text-slate-300 mx-auto mb-4" />
