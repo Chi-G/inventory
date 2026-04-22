@@ -10,12 +10,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    /**
+     * Constants for timed access restrictions
+     */
+    const TIMED_ACCESS_HOURS = 1;      // Max session duration
+    const LOCKOUT_HOURS = 12;         // Cooldown duration after logout/timeout
 
     /**
      * The attributes that are mass assignable.
@@ -29,6 +30,8 @@ class User extends Authenticatable
         'role',
         'uuid',
         'role_id',
+        'access_expires_at',
+        'can_login_after',
     ];
 
     /**
@@ -88,8 +91,10 @@ class User extends Authenticatable
     /**
      * Boot the model to auto-generate UUID on creation
      */
-    protected static function booted()
+    protected static function boot()
     {
+        parent::boot();
+
         static::creating(function ($user) {
             if (!$user->uuid) {
                 $user->uuid = (string) \Illuminate\Support\Str::uuid();

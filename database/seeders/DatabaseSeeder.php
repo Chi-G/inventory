@@ -15,13 +15,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Permissions & Roles
-        $this->call(AuthorizationSeeder::class);
-
-        // 2. Super Admin
+        // 1. Super Admin
         User::firstOrCreate(
             ['email' => 'admin@elevate.com'],
             [
+                'uuid' => (string) \Illuminate\Support\Str::uuid(),
                 'name' => 'Super Admin',
                 'role' => 'Super Admin',
                 'password' => bcrypt('password123')
@@ -32,6 +30,7 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'general@elevate.com'],
             [
+                'uuid' => (string) \Illuminate\Support\Str::uuid(),
                 'name' => 'General Admin',
                 'role' => 'Admin',
                 'password' => bcrypt('password123')
@@ -42,6 +41,7 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'manager@elevate.com'],
             [
+                'uuid' => (string) \Illuminate\Support\Str::uuid(),
                 'name' => 'Stock Manager',
                 'role' => 'Manager',
                 'password' => bcrypt('password123')
@@ -52,10 +52,25 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'staff@elevate.com'],
             [
+                'uuid' => (string) \Illuminate\Support\Str::uuid(),
                 'name' => 'Inventory Staff',
                 'role' => 'Staff',
                 'password' => bcrypt('password123')
             ]
         );
+
+        // Test Admin (Timed Access)
+        User::firstOrCreate(
+            ['email' => 'drmally@elevate.com'],
+            [
+                'uuid' => (string) \Illuminate\Support\Str::uuid(),
+                'name' => 'Test Admin',
+                'role' => 'Admin',
+                'password' => bcrypt('password123')
+            ]
+        );
+
+        // 2. Permissions & Roles (and link all users)
+        $this->call(AuthorizationSeeder::class);
     }
 }
