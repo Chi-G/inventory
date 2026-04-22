@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request, $slug)
+    public function index(Request $request)
     {
         // 1. Core KPIs
         $totalProducts = Product::count();

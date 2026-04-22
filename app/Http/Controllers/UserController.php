@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    public function index(Request $request, $slug)
+    public function index(Request $request)
     {
         $this->authorize('users.view');
         
@@ -25,7 +25,7 @@ class UserController extends Controller
         return Inertia::render('Users/Index', ['users' => $users]);
     }
 
-    public function store(Request $request, $slug)
+    public function store(Request $request)
     {
         $this->authorize('users.create');
 
@@ -45,7 +45,7 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'User created successfully.');
     }
 
-    public function update(Request $request, $slug, User $user)
+    public function update(Request $request, User $user)
     {
         $this->authorize('users.edit');
 
@@ -63,7 +63,7 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'User updated successfully.');
     }
 
-    public function destroy(Request $request, $slug, User $user)
+    public function destroy(Request $request, User $user)
     {
         $this->authorize('users.delete');
 

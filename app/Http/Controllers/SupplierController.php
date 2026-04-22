@@ -8,7 +8,7 @@ use Inertia\Inertia;
 
 class SupplierController extends Controller
 {
-    public function index($slug)
+    public function index()
     {
         $this->authorize('suppliers.view');
         
@@ -17,7 +17,7 @@ class SupplierController extends Controller
         ]);
     }
 
-    public function store(Request $request, $slug)
+    public function store(Request $request)
     {
         $this->authorize('suppliers.create');
 
@@ -33,7 +33,7 @@ class SupplierController extends Controller
         return redirect()->back()->with('success', 'Supplier created successfully.');
     }
 
-    public function update(Request $request, $slug, Supplier $supplier)
+    public function update(Request $request, Supplier $supplier)
     {
         $this->authorize('suppliers.edit');
 
@@ -49,7 +49,7 @@ class SupplierController extends Controller
         return redirect()->back()->with('success', 'Supplier updated successfully.');
     }
 
-    public function destroy($slug, Supplier $supplier)
+    public function destroy(Supplier $supplier)
     {
         $this->authorize('suppliers.delete');
 
