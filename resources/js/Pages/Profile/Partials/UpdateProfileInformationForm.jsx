@@ -21,7 +21,7 @@ export default function UpdateProfileInformation({
     const submit = (e) => {
         e.preventDefault();
 
-        patch(route('profile.update'));
+        patch(route('profile.update', { slug: user.slug }));
     };
 
     return (

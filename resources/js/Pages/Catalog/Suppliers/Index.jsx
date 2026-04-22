@@ -73,7 +73,7 @@ export default function Index({ suppliers }) {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(route('suppliers.destroy', { id, slug: auth.user.slug }));
+                router.delete(route('suppliers.destroy', { supplier: id, slug: auth.user.slug }));
             }
         });
     };

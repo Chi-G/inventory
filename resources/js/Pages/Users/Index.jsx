@@ -58,14 +58,14 @@ export default function Index({ users }) {
             confirmButtonText: 'Yes, Delete'
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(route('users.destroy', user.id));
+                router.delete(route('users.destroy', { user: user.id, slug: auth.user.slug }));
             }
         });
     };
 
     const handleCreate = (e) => {
         e.preventDefault();
-        post(route('users.store'), {
+        post(route('users.store', { slug: auth.user.slug }), {
             onSuccess: () => {
                 setIsCreateModalOpen(false);
                 reset();
@@ -75,7 +75,7 @@ export default function Index({ users }) {
 
     const handleEdit = (e) => {
         e.preventDefault();
-        put(route('users.update', selectedUser.id), {
+        put(route('users.update', { user: selectedUser.id, slug: auth.user.slug }), {
             onSuccess: () => {
                 setIsEditModalOpen(false);
                 reset();

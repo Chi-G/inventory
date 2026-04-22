@@ -72,7 +72,7 @@ export default function Index({ categories, parentCategories }) {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(route('categories.destroy', { category: id, slug: auth.user.slug }));
+                router.delete(route('categories.destroy', { category: category.id, slug: auth.user.slug }));
             }
         });
     };

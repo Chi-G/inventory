@@ -1,9 +1,10 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Box, Tag, Layers, ArrowRight, DollarSign, AlertTriangle, User, History } from 'lucide-react';
 
 export default function ProductSheet({ product }) {
+    const { auth } = usePage().props;
     // Auto-trigger print dialog when the page loads
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -172,7 +173,7 @@ export default function ProductSheet({ product }) {
                     <div>
                         <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider mb-4">Official Verification Barcode</h4>
                         <img 
-                            src={route('barcodes.generate', product.barcode_value)} 
+                            src={route('barcodes.generate', { value: product.barcode_value, slug: auth.user.slug })} 
                             alt={product.barcode_value}
                             className="h-24 w-80 object-cover"
                             style={{ imageRendering: 'crisp-edges' }}
