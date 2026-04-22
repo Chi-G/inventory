@@ -80,6 +80,14 @@ class ProductController extends Controller
         return redirect()->route('products.index', ['slug' => auth()->user()->slug])->with('success', 'Product added to catalog.');
     }
 
+    public function show(Product $product, $slug = null)
+    {
+        return redirect()->route('products.edit', [
+            'slug' => auth()->user()->slug,
+            'product' => $product->id
+        ]);
+    }
+
     public function edit(Product $product, $slug = null)
     {
         $this->authorize('products.edit');

@@ -17,6 +17,11 @@ class SupplierController extends Controller
         ]);
     }
 
+    public function show(Supplier $supplier, $slug = null)
+    {
+        return redirect()->route('suppliers.index', ['slug' => auth()->user()->slug]);
+    }
+
     public function store(Request $request, $slug = null)
     {
         $this->authorize('suppliers.create');

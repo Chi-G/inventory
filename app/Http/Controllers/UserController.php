@@ -25,6 +25,11 @@ class UserController extends Controller
         return Inertia::render('Users/Index', ['users' => $users]);
     }
 
+    public function show(User $user, $slug = null)
+    {
+        return redirect()->route('users.index', ['slug' => auth()->user()->slug]);
+    }
+
     public function store(Request $request, $slug = null)
     {
         $this->authorize('users.create');

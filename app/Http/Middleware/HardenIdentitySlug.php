@@ -18,15 +18,18 @@ class HardenIdentitySlug
         $slug = $request->route('slug');
         $user = $request->user();
 
-        if ($user && $slug && $user->slug !== $slug) {
-            // Get the current route name and parameters
-            $routeName = $request->route()->getName();
-            $parameters = $request->route()->parameters();
-            
-            // Override the incorrect slug with the correct one
-            $parameters['slug'] = $user->slug;
+        if ($user && $slug && strtolower($user->slug) !== strtolower($slug)) {
+            // Only redirect for GET requests to avoid losing POST/PUT data
+            if ($request->isMethod('GET')) {
+                // Get the current route name and parameters
+                $routeName = $request->route()->getName();
+                $parameters = $request->route()->parameters();
+                
+                // Override the incorrect slug with the correct one
+                $parameters['slug'] = $user->slug;
 
-            return redirect()->route($routeName, $parameters);
+                return redirect()->route($routeName, $parameters);
+            }
         }
 
         $request->route()->forgetParameter('slug');

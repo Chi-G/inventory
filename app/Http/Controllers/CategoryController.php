@@ -18,6 +18,11 @@ class CategoryController extends Controller
         ]);
     }
 
+    public function show(Category $category, $slug = null)
+    {
+        return redirect()->route('categories.index', ['slug' => auth()->user()->slug]);
+    }
+
     public function store(Request $request, $slug = null)
     {
         $this->authorize('categories.create');
