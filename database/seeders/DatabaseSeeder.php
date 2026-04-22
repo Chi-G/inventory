@@ -70,7 +70,13 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 2. Permissions & Roles (and link all users)
+        // 2. Catalog & Products
+        $this->call([
+            CatalogSeeder::class,
+            ProductSeeder::class,
+        ]);
+
+        // 3. Permissions & Roles (and link all users)
         $this->call(AuthorizationSeeder::class);
     }
 }
