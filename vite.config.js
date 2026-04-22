@@ -7,7 +7,7 @@ import react from '@vitejs/plugin-react';
 // to avoid hard-coded redirection issues.
 
 export default defineConfig(({ mode }) => ({
-    base: '/',
+    base: '',
     plugins: [
         laravel({
             input: 'resources/js/app.jsx',
