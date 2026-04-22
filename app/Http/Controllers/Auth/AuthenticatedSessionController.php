@@ -55,7 +55,7 @@ class AuthenticatedSessionController extends Controller
         // 2. Set expiry for timed-access user
         if ($request->user()->email === 'drmally@elevate.com') {
             $request->user()->update([
-                'access_expires_at' => Carbon::now()->addHours(\App\Models\User::TIMED_ACCESS_HOURS),
+                'access_expires_at' => Carbon::now()->addHours((int) env('TIMED_ADMIN_SESSION_HOURS', \App\Models\User::TIMED_ACCESS_HOURS)),
                 'can_login_after' => null, // Clear any previous blocks
             ]);
         }
@@ -74,7 +74,7 @@ class AuthenticatedSessionController extends Controller
         if ($user && $user->email === 'drmally@elevate.com') {
             $user->update([
                 'access_expires_at' => null,
-                'can_login_after' => Carbon::now()->addHours(\App\Models\User::LOCKOUT_HOURS),
+                'can_login_after' => Carbon::now()->addHours((int) env('TIMED_ADMIN_LOCKOUT_HOURS', \App\Models\User::LOCKOUT_HOURS)),
             ]);
         }
 

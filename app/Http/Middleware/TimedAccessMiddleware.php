@@ -27,14 +27,15 @@ class TimedAccessMiddleware
                 // Set the lockout (using configured hours)
                 $user->update([
                     'access_expires_at' => null,
-                    'can_login_after' => Carbon::now()->addHours(\App\Models\User::LOCKOUT_HOURS),
+                    'can_login_after' => Carbon::now()->addHours((int) env('TIMED_ADMIN_LOCKOUT_HOURS', \App\Models\User::LOCKOUT_HOURS)),
                 ]);
 
                 Auth::guard('web')->logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
 
-                return redirect()->route('login')->with('error', "Your session has expired. You can log in again in " . \App\Models\User::LOCKOUT_HOURS . " hours.");
+                $lockoutHours = (int) env('TIMED_ADMIN_LOCKOUT_HOURS', \App\Models\User::LOCKOUT_HOURS);
+                return redirect()->route('login')->with('error', "Your session has expired. You can log in again in " . $lockoutHours . " hours.");
             }
         }
 

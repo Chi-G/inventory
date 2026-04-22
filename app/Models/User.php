@@ -15,8 +15,11 @@ class User extends Authenticatable
     /**
      * Constants for timed access restrictions
      */
-    const TIMED_ACCESS_HOURS = 1;      // Max session duration
-    const LOCKOUT_HOURS = 12;         // Cooldown duration after logout/timeout
+    /**
+     * Constants for timed access restrictions (loaded from .env)
+     */
+    const TIMED_ACCESS_HOURS = 1;      // Default if not in .env
+    const LOCKOUT_HOURS = 12;         // Default if not in .env
 
     /**
      * The attributes that are mass assignable.
