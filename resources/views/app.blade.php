@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="icon" type="image/x-icon" href="{{ config('app.env') === 'production' ? config('app.url') . '/favicon.ico?v=3' : '/favicon.ico' }}">
+        <link rel="icon" type="image/x-icon" href="{{ config('app.env') === 'production' ? config('app.url') . '/brand-favicon.png?v=1' : '/brand-favicon.png' }}">
 
         <title inertia>{{ config('app.name', 'Elevate Interiors') }}</title>
 
