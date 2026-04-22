@@ -92,7 +92,7 @@ export default function Dashboard({ stats, recentMovements, stockStatus, trends 
                         <p className="text-slate-500 mt-1 font-medium">Real-time status of your interior inventory ecosystem.</p>
                     </div>
                     <div className="hidden sm:flex gap-3">
-                        {usePage().props.auth.can['scanner.index'] && (
+                        {usePage().props.auth.user && usePage().props.auth.can['scanner.index'] && (
                             <Link
                                 href={route('scanner.index', { slug: usePage().props.auth.user.slug })}
                                 className="h-11 px-6 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-2 hover:bg-indigo-600 transition-all shadow-lg shadow-slate-200"
@@ -215,10 +215,12 @@ export default function Dashboard({ stats, recentMovements, stockStatus, trends 
                                 <History className="w-5 h-5 text-indigo-500" />
                                 Recent Activity
                             </h2>
-                            <Link href={route('inventory.logs', { slug: usePage().props.auth.user.slug })} className="text-sm font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors">
-                                View full audit
-                                <ChevronRight className="w-4 h-4" />
-                            </Link>
+                            {usePage().props.auth.user && (
+                                <Link href={route('inventory.logs', { slug: usePage().props.auth.user.slug })} className="text-sm font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors">
+                                    View full audit
+                                    <ChevronRight className="w-4 h-4" />
+                                </Link>
+                            )}
                         </div>
 
                         <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden transition-colors">

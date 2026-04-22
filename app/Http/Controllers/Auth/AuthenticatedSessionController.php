@@ -31,13 +31,20 @@ class AuthenticatedSessionController extends Controller
     {
         // 1. Pre-auth check for timed-access user
         $user = \App\Models\User::where('email', $request->email)->first();
-        if ($user && $user->email === 'drmally@elevate.com' && $user->can_login_after) {
-            if (\Carbon\Carbon::now()->lessThan($user->can_login_after)) {
-                $hoursRemaining = round(\Carbon\Carbon::now()->diffInHours($user->can_login_after, false), 1);
-                return back()->withErrors([
-                    'email' => "Access restricted. You must wait {$hoursRemaining} more hours before logging in again.",
-                ]);
-            }
+        if ($user && $user->can_login_after && Carbon::now()->lt($user->can_login_after)) {
+            $waitMinutes = Carbon::now()->diffInMinutes($user->can_login_after);
+            $waitText = $waitMinutes > 60 
+                ? round($waitMinutes / 60, 1) . ' hours' 
+                : $waitMinutes . ' minutes';
+
+            return back()->with('lockout', [
+                'email' => $user->email,
+                'unlock_at' => $user->can_login_after->toIso8601String(),
+                'wait_text' => $waitText,
+                'message' => "Security Policy Account Lockout. Access is restricted until {$user->can_login_after->format('g:i A')}."
+            ])->withErrors([
+                'email' => "This account is currently in a mandatory 12-hour lockout period post-session. Please try again in {$waitText}."
+            ]);
         }
 
         $request->authenticate();

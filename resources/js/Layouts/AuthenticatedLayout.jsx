@@ -15,8 +15,12 @@ const Toast = Swal.mixin({
 
 export default function AuthenticatedLayout({ header, children }) {
     const { auth, flash } = usePage().props;
-    const user = auth.user;
+    const user = auth?.user;
     const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    if (!user) {
+        return null; // Fallback during session transition
+    }
 
     useEffect(() => {
         if (flash?.success) {
@@ -97,10 +101,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                             className="inline-flex items-center rounded-full bg-white p-1 pe-3 text-sm font-medium text-slate-600 hover:bg-slate-50 focus:outline-none transition-colors border border-slate-200 shadow-sm"
                                         >
                                             <div className="h-8 w-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold mr-2 text-xs">
-                                                {user.name.charAt(0)}
+                                                {user?.name?.charAt(0) || '?'}
                                             </div>
                                             <span className="hidden sm:inline-block truncate max-w-[120px]">
-                                                {user.name.split(' ')[0]}
+                                                {(user?.name || 'User').split(' ')[0]}
                                             </span>
                                             <svg className="-me-0.5 ms-2 h-4 w-4 text-slate-400 hidden sm:block" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -110,10 +114,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </Dropdown.Trigger>
                                 <Dropdown.Content align="right" width="48">
                                     <div className="px-4 py-3 sm:hidden border-b border-gray-100">
-                                        <p className="text-sm leading-5 text-gray-900">{user.name}</p>
-                                        <p className="text-xs leading-5 text-gray-500 truncate">{user.email}</p>
+                                        <p className="text-sm leading-5 text-gray-900">{user?.name}</p>
+                                        <p className="text-xs leading-5 text-gray-500 truncate">{user?.email}</p>
                                     </div>
-                                    <Dropdown.Link href={route('profile.edit', { slug: user.slug })}>Profile Settings</Dropdown.Link>
+                                    <Dropdown.Link href={route('profile.edit', { slug: user?.slug })}>Profile Settings</Dropdown.Link>
                                     <Dropdown.Link href={route('logout')} method="post" as="button">Log Out</Dropdown.Link>
                                 </Dropdown.Content>
                             </Dropdown>

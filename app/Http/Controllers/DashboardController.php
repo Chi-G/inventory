@@ -70,7 +70,7 @@ class DashboardController extends Controller
                 'low_stock_count' => $lowStockCount,
                 'total_suppliers' => $totalSuppliers,
                 'total_users' => User::count(),
-                'user_slug' => $request->user()->slug,
+                'user_slug' => $request->user()?->slug,
             ],
             'recentMovements' => $recentMovements,
             'stockStatus' => $stockStatus,

@@ -4,12 +4,21 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import LockoutModal from '@/Components/LockoutModal';
 
 export default function Login({ status, canResetPassword }) {
+    const { flash } = usePage().props;
     const [showPassword, setShowPassword] = useState(false);
+    const [showLockoutModal, setShowLockoutModal] = useState(false);
+
+    useEffect(() => {
+        if (flash.lockout) {
+            setShowLockoutModal(true);
+        }
+    }, [flash.lockout]);
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -119,6 +128,12 @@ export default function Login({ status, canResetPassword }) {
                     Elevate Interiors System v1.0
                 </p>
             </form>
+
+            <LockoutModal 
+                show={showLockoutModal} 
+                onClose={() => setShowLockoutModal(false)} 
+                lockoutData={flash.lockout} 
+            />
         </GuestLayout>
     );
 }
