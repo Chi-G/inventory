@@ -19,22 +19,15 @@ Route::any('/', function () {
 // One-time fix for missing permissions in production
 Route::any('/debug-files', function() {
     $publicPath = public_path();
-    $files = scandir($publicPath);
-    $data = [
-        'path' => $publicPath,
-        'files' => [],
-        'detailed' => []
-    ];
-    foreach ($files as $file) {
-        $fullPath = $publicPath . '/' . $file;
-        $data['detailed'][$file] = [
-            'exists' => file_exists($fullPath),
-            'readable' => is_readable($fullPath),
-            'perms' => substr(sprintf('%o', fileperms($fullPath)), -4),
-            'size' => filesize($fullPath),
-        ];
-    }
-    return response()->json($data);
+    $file = $publicPath . '/brand-logo.png';
+    return response()->json([
+        'path' => $file,
+        'exists' => file_exists($file),
+        'readable' => is_readable($file),
+        'perms' => file_exists($file) ? substr(sprintf('%o', fileperms($file)), -4) : null,
+        'size' => file_exists($file) ? filesize($file) : null,
+        'owner' => file_exists($file) ? posix_getpwuid(fileowner($file))['name'] : null,
+    ]);
 });
 
 // Standard Auth Routes (Login, etc.)
