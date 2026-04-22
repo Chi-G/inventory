@@ -2,11 +2,8 @@
     RewriteEngine On
     RewriteBase /inventory/
 
-    # Handle the root request
-    RewriteRule ^$ index.php [L]
-
-    # Handle everything else (like /login)
+    # Handle everything by passing it to index.php
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ index.php/$1 [L]
+    RewriteRule ^(.*)$ index.php [L]
 </IfModule>

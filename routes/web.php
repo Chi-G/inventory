@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
 // This handles the root of the app (forahia.com/inventory/)
-Route::get('/', function () {
+Route::any('/', function () {
     return redirect()->route('login');
 });
 
