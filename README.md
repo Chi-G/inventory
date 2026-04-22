@@ -85,11 +85,14 @@ The application is pre-configured for deployment in subdirectories (specifically
    sh deploy.sh
    ```
 
-*Demo link: `https://forahia.com/inventory`*
+*Live Demo:* [https://elevate-interiors-main-u9gujh.laravel.cloud](https://elevate-interiors-main-u9gujh.laravel.cloud)
+
+## Environment Configuration
+The application is environment-aware and supports both root-domain (Laravel Cloud) and subdirectory (Hostinger) deployments. Use the `APP_URL` and `ASSET_URL` environment variables to configure your specific instance.
 
 ## Ownership
 
 Proprietary software developed for **Elevate Interiors**.
 
 ---
-© 2026 Elevate Interiors. All Rights Reserved.
+© 2026 Elevate Interiors Inc. All Rights Reserved.
