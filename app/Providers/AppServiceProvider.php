@@ -59,17 +59,17 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // 2. Register all permissions as Gates
-        if (Schema::hasTable('permissions')) {
-            try {
+        try {
+            if (Schema::hasTable('permissions')) {
                 $permissions = Permission::all();
                 foreach ($permissions as $permission) {
                     Gate::define($permission->name, function ($user) use ($permission) {
                         return $user->hasPermission($permission->name);
                     });
                 }
-            } catch (\Exception $e) {
-                // Silently fail if DB is not ready
             }
+        } catch (\Exception $e) {
+            // Silently fail if DB is not ready (e.g., during build or migrations)
         }
     }
 }
