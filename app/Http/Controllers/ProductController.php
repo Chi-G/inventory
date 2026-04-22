@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, $slug)
     {
         $this->authorize('products.view');
         $products = Product::with('category.parent')
@@ -39,7 +39,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function create()
+    public function create($slug)
     {
         $this->authorize('products.create');
         
@@ -49,7 +49,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $slug)
     {
         $this->authorize('products.create');
         
@@ -77,10 +77,10 @@ class ProductController extends Controller
 
         Product::create($validated);
 
-        return redirect()->route('products.index')->with('success', 'Product added to catalog.');
+        return redirect()->route('products.index', ['slug' => $slug])->with('success', 'Product added to catalog.');
     }
 
-    public function edit(Product $product)
+    public function edit($slug, Product $product)
     {
         $this->authorize('products.edit');
         
@@ -90,7 +90,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $slug, Product $product)
     {
         $this->authorize('products.edit');
         
@@ -117,10 +117,10 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        return redirect()->route('products.index')->with('success', 'Product updated successfully.');
+        return redirect()->route('products.index', ['slug' => $slug])->with('success', 'Product updated successfully.');
     }
 
-    public function destroy(Product $product)
+    public function destroy($slug, Product $product)
     {
         $this->authorize('products.delete');
         
@@ -133,7 +133,7 @@ class ProductController extends Controller
         return redirect()->back()->with('success', 'Product removed from system.');
     }
 
-    public function printBarcode(Product $product)
+    public function printBarcode($slug, Product $product)
     {
         $this->authorize('products.barcode');
         
@@ -142,7 +142,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function scanCenter()
+    public function scanCenter($slug)
     {
         return Inertia::render('Catalog/Scanner/Index');
     }
@@ -172,7 +172,7 @@ class ProductController extends Controller
             'attributes' => $product->attributes
         ]);
     }
-    public function export()
+    public function export($slug)
     {
         $this->authorize('products.export');
         

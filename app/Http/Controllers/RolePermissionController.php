@@ -12,7 +12,7 @@ class RolePermissionController extends Controller
     /**
      * Display the Role-Permission Matrix
      */
-    public function index()
+    public function index($slug)
     {
         // Fetch roles we want to manage (exclude super-admin for safety)
         $roles = Role::where('name', '!=', 'super-admin')->get();
@@ -36,7 +36,7 @@ class RolePermissionController extends Controller
     /**
      * Update the permissions for a specific role
      */
-    public function update(Request $request)
+    public function update(Request $request, $slug)
     {
         $request->validate([
             'role_id' => 'required|exists:roles,id',
