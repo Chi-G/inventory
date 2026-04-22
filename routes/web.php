@@ -17,14 +17,6 @@ Route::any('/', function () {
     return redirect()->route('login');
 });
 
-// A simple debug route
-Route::get('/debug-clear', function() {
-    Artisan::call('route:clear');
-    Artisan::call('config:clear');
-    Artisan::call('cache:clear');
-    return "System Cleared!";
-});
-
 // Standard Auth Routes (Login, etc.)
 require __DIR__.'/auth.php';
 
