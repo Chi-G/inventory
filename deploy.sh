@@ -16,11 +16,11 @@ php artisan migrate --force
 echo "🌱 Seeding initial data..."
 php artisan db:seed --force
 
-# 3. Optimization
+# 2. Optimization
 echo "⚡ Optimizing caches..."
-# 2. Fix environment variables for subdirectory
-sed -i 's|APP_URL=.*|APP_URL=https://forahia.com/inventory|g' .env
-sed -i 's|ASSET_URL=.*|ASSET_URL=https://forahia.com/inventory|g' .env
+# Note: APP_URL and ASSET_URL should be set in your platform environment settings 
+# (Laravel Cloud / Hostinger) to avoid redirection issues.
+
 
 # --- NUCLEAR CACHE CLEAR ---
 echo "🧨 Nuclear Cache Clear..."
