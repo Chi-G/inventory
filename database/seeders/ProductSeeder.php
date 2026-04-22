@@ -13,11 +13,6 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        // Disable foreign key checks for clean truncation
-        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
-        Product::truncate();
-        StockMovement::truncate();
-        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
 
         $admin = User::first();
         if (!$admin) return;
@@ -84,31 +79,49 @@ class ProductSeeder extends Seeder
                 $subCat = Category::where('name', $subName)->where('parent_id', $parentCat->id)->first() ?: $parentCat;
 
                 foreach ($products as $pData) {
-                    $sku = strtoupper(substr($parentName, 0, 3)) . '-' . strtoupper(substr($subName, 0, 3)) . '-' . Str::random(4);
-                    
-                    $product = Product::create([
-                        'sku' => $sku,
-                        'name' => $pData['name'],
-                        'description' => "Premium quality {$pData['name']} from the {$parentName} collection.",
-                        'category_id' => $subCat->id,
-                        'cost_price' => $pData['cost'],
-                        'retail_price' => $pData['price'],
-                        'barcode_value' => $sku,
-                        'barcode_symbology' => 'CODE128',
-                        'attributes' => $pData['attr'] ?? [],
-                        'alert_threshold' => 5,
-                    ]);
+                    $productExists = Product::where('name', $pData['name'])
+                        ->where('category_id', $subCat->id)
+                        ->first();
 
-                    // Add initial stock
-                    StockMovement::create([
-                        'product_id' => $product->id,
-                        'user_id' => $admin->id,
-                        'quantity' => rand(10, 50),
-                        'type' => 'IN',
-                        'notes' => 'Initial inventory seed.',
-                    ]);
+                    $sku = $productExists ? $productExists->sku : strtoupper(substr($parentName, 0, 3)) . '-' . strtoupper(substr($subName, 0, 3)) . '-' . Str::random(4);
+                    
+                    $product = Product::updateOrCreate(
+                        ['name' => $pData['name'], 'category_id' => $subCat->id],
+                        [
+                            'sku' => $sku,
+                            'description' => "Premium quality {$pData['name']} from the {$parentName} collection.",
+                            'cost_price' => $pData['cost'],
+                            'retail_price' => $pData['price'],
+                            'barcode_value' => $sku,
+                            'barcode_symbology' => 'CODE128',
+                            'attributes' => $pData['attr'] ?? [],
+                            'alert_threshold' => 5,
+                        ]
+                    );
+
+                    // Add initial stock only if it doesn't already have the seed movement
+                    $hasSeedMovement = StockMovement::where('product_id', $product->id)
+                        ->where('notes', 'Initial inventory seed.')
+                        ->exists();
+
+                    if (!$hasSeedMovement) {
+                        StockMovement::create([
+                            'product_id' => $product->id,
+                            'user_id' => $admin->id,
+                            'quantity' => rand(10, 50),
+                            'type' => 'IN',
+                            'notes' => 'Initial inventory seed.',
+                        ]);
+                    }
                 }
             }
+        }
+
+        // Final Sync: Ensure current_stock matches all movements
+        // This fixes instances where stock was added previously while events were disabled
+        foreach (Product::all() as $product) {
+            $actualStock = StockMovement::where('product_id', $product->id)->sum('quantity');
+            $product->update(['current_stock' => (int)$actualStock]);
         }
     }
 }

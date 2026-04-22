@@ -13,6 +13,9 @@ composer install --optimize-autoloader --no-dev
 echo "🗄️ Running migrations..."
 php artisan migrate --force
 
+echo "🌱 Seeding initial data..."
+php artisan db:seed --force
+
 # 3. Optimization
 echo "⚡ Optimizing caches..."
 # 2. Fix environment variables for subdirectory
