@@ -17,12 +17,6 @@ Route::any('/', function () {
     return redirect()->route('login');
 });
 
-// One-time fix for missing permissions in production
-Route::get('/fix-permissions', function() {
-    Artisan::call('db:seed', ['--class' => 'AuthorizationSeeder', '--force' => true]);
-    return "Permissions Updated Successfully! Please refresh the dashboard.";
-});
-
 // Standard Auth Routes (Login, etc.)
 require __DIR__.'/auth.php';
 
