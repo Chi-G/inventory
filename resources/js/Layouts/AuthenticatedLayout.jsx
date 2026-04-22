@@ -28,6 +28,9 @@ export default function AuthenticatedLayout({ header, children }) {
     }, [flash]);
 
     useEffect(() => {
+        // Only attempt to listen if Echo is initialized
+        if (!window.Echo) return;
+
         const channel = window.Echo.channel('inventory')
             .listen('.stock.updated', (data) => {
                 const action = data.movementType === 'IN' ? 'Stock Added' : (data.movementType === 'OUT' ? 'Stock Removed' : 'Stock Adjusted');

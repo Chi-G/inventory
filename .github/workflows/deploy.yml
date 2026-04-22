@@ -30,6 +30,10 @@ jobs:
 
     - name: Run Build
       run: npm run build
+      env:
+        VITE_PUSHER_APP_KEY: ${{ secrets.PUSHER_APP_KEY }}
+        VITE_PUSHER_APP_CLUSTER: ${{ secrets.PUSHER_APP_CLUSTER }}
+        VITE_APP_NAME: "Elevate Interiors"
 
     - name: Copy Build Assets via SCP
       uses: appleboy/scp-action@v0.1.7
