@@ -16,18 +16,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        if (config('app.env') === 'production' || env('APP_ENV') === 'production') {
-            // FORCE the Application URL for consistency across all URL generation
-            $url = 'https://forahia.com/inventory';
-            config(['app.url' => $url]);
+        if (config('app.env') === 'production') {
+            // Use the URL from the environment configuration (Laravel Cloud or Hostinger .env)
+            $url = config('app.url');
             
-            // Fix for Hostinger's public path detection in subdirectories
+            // Fix for host detection in potential subdirectory deployments
             $this->app->bind('path.public', function() {
                 return base_path('public');
             });
 
-            // Force HTTPS and the Root URL immediately
-            URL::forceRootUrl($url);
+            // Ensure HTTPS and standard Root URL usage
+            if ($url) {
+                URL::forceRootUrl($url);
+            }
             URL::forceScheme('https');
         }
     }
@@ -39,16 +40,20 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
-        if (config('app.env') === 'production' || env('APP_ENV') === 'production') {
-            $url = 'https://forahia.com/inventory';
+        if (config('app.env') === 'production') {
+            $url = config('app.url');
 
-            // Ensure all generated URLs use the subdirectory path
-            URL::forceRootUrl($url);
+            // Force the configured Root URL and Scheme
+            if ($url) {
+                URL::forceRootUrl($url);
+            }
             URL::forceScheme('https');
             
             // Inject asset URL for Vite manifest resolution
-            putenv("VITE_ASSET_URL=$url");
-            $_ENV['VITE_ASSET_URL'] = $url;
+            if ($url) {
+                putenv("VITE_ASSET_URL=$url");
+                $_ENV['VITE_ASSET_URL'] = $url;
+            }
         }
 
         // --- DYNAMIC PERMISSION SYSTEM ---
