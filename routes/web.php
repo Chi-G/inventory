@@ -20,12 +20,21 @@ Route::any('/', function () {
 Route::any('/debug-files', function() {
     $publicPath = public_path();
     $files = scandir($publicPath);
-    return response()->json([
+    $data = [
         'path' => $publicPath,
-        'files' => $files,
-        'exists_brand_logo' => file_exists($publicPath . '/brand-logo.png'),
-        'exists_logo_png' => file_exists($publicPath . '/logo.png'),
-    ]);
+        'files' => [],
+        'detailed' => []
+    ];
+    foreach ($files as $file) {
+        $fullPath = $publicPath . '/' . $file;
+        $data['detailed'][$file] = [
+            'exists' => file_exists($fullPath),
+            'readable' => is_readable($fullPath),
+            'perms' => substr(sprintf('%o', fileperms($fullPath)), -4),
+            'size' => filesize($fullPath),
+        ];
+    }
+    return response()->json($data);
 });
 
 // Standard Auth Routes (Login, etc.)
