@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, $slug = null)
     {
         $this->authorize('products.view');
         $products = Product::with('category.parent')
@@ -39,7 +39,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function create()
+    public function create($slug = null)
     {
         $this->authorize('products.create');
         
@@ -49,7 +49,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $slug = null)
     {
         $this->authorize('products.create');
         
@@ -80,7 +80,7 @@ class ProductController extends Controller
         return redirect()->route('products.index', ['slug' => auth()->user()->slug])->with('success', 'Product added to catalog.');
     }
 
-    public function edit(Product $product)
+    public function edit(Product $product, $slug = null)
     {
         $this->authorize('products.edit');
         
@@ -90,7 +90,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function update(Request $request, Product $product)
+    public function update(Request $request, Product $product, $slug = null)
     {
         $this->authorize('products.edit');
         
@@ -120,7 +120,7 @@ class ProductController extends Controller
         return redirect()->route('products.index', ['slug' => auth()->user()->slug])->with('success', 'Product updated successfully.');
     }
 
-    public function destroy(Product $product)
+    public function destroy(Product $product, $slug = null)
     {
         $this->authorize('products.delete');
         
@@ -133,7 +133,7 @@ class ProductController extends Controller
         return redirect()->back()->with('success', 'Product removed from system.');
     }
 
-    public function printBarcode(Product $product)
+    public function printBarcode(Product $product, $slug = null)
     {
         $this->authorize('products.barcode');
         
@@ -142,12 +142,12 @@ class ProductController extends Controller
         ]);
     }
 
-    public function scanCenter()
+    public function scanCenter($slug = null)
     {
         return Inertia::render('Catalog/Scanner/Index');
     }
 
-    public function apiLookup($barcode)
+    public function apiLookup($barcode, $slug = null)
     {
         $product = Product::with(['category.parent'])
             ->where('barcode_value', $barcode)
@@ -172,7 +172,7 @@ class ProductController extends Controller
             'attributes' => $product->attributes
         ]);
     }
-    public function export()
+    public function export($slug = null)
     {
         $this->authorize('products.export');
         

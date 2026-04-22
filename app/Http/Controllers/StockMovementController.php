@@ -11,7 +11,7 @@ class StockMovementController extends Controller
     /**
      * Display a listing of stock movements.
      */
-    public function index(Request $request)
+    public function index(Request $request, $slug = null)
     {
         $this->authorize('inventory.view');
         
@@ -32,7 +32,7 @@ class StockMovementController extends Controller
     /**
      * Handle incoming stock adjustments.
      */
-    public function store(Request $request, Product $product)
+    public function store(Request $request, Product $product, $slug = null)
     {
         $this->authorize('inventory.adjust');
 
@@ -67,7 +67,7 @@ class StockMovementController extends Controller
             return back()->with('error', $e->getMessage());
         }
     }
-    public function export()
+    public function export($slug = null)
     {
         $this->authorize('inventory.export');
 

@@ -173,8 +173,8 @@ export default function ProductSheet({ product }) {
                     <div>
                         <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider mb-4">Official Verification Barcode</h4>
                         <img 
-                            src={route('barcodes.generate', { value: product.barcode_value, slug: auth.user.slug })} 
-                            alt={product.barcode_value}
+                            src={route('barcodes.generate', { value: product.barcode_value || product.sku, slug: auth.user.slug })} 
+                            alt={product.barcode_value || product.sku}
                             className="h-24 w-80 object-cover"
                             style={{ imageRendering: 'crisp-edges' }}
                         />

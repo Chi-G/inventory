@@ -7,7 +7,7 @@ use Picqer\Barcode\BarcodeGeneratorSVG;
 
 class BarcodeController extends Controller
 {
-    public function generate($value)
+    public function generate($value, $slug = null)
     {
         $generator = new BarcodeGeneratorSVG();
         $barcode = $generator->getBarcode($value, $generator::TYPE_CODE_128);

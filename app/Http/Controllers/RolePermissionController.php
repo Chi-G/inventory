@@ -36,7 +36,7 @@ class RolePermissionController extends Controller
     /**
      * Update the permissions for a specific role
      */
-    public function update(Request $request)
+    public function update(Request $request, $slug = null)
     {
         $request->validate([
             'role_id' => 'required|exists:roles,id',

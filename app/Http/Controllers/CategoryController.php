@@ -8,7 +8,7 @@ use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
-    public function index()
+    public function index($slug = null)
     {
         $this->authorize('categories.view');
 
@@ -18,7 +18,7 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $slug = null)
     {
         $this->authorize('categories.create');
 
@@ -33,7 +33,7 @@ class CategoryController extends Controller
         return redirect()->back()->with('success', 'Category created successfully.');
     }
 
-    public function update(Request $request, Category $category)
+    public function update(Request $request, Category $category, $slug = null)
     {
         $this->authorize('categories.edit');
 
@@ -48,7 +48,7 @@ class CategoryController extends Controller
         return redirect()->back()->with('success', 'Category updated successfully.');
     } 
 
-    public function destroy(Category $category)
+    public function destroy(Category $category, $slug = null)
     {
         $this->authorize('categories.delete');
 

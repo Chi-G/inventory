@@ -54,7 +54,7 @@ export default function Index({ products, categories, suppliers, filters }) {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(route('products.destroy', { id, slug: auth.user.slug }));
+                router.delete(route('products.destroy', { product: id, slug: auth.user.slug }));
             }
         });
     };
