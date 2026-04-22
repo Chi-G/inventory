@@ -3,10 +3,10 @@
     RewriteBase /inventory/
 
     # Handle the root request
-    RewriteRule ^$ public/index.php [L]
+    RewriteRule ^$ index.php [L]
 
     # Handle everything else (like /login)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ public/index.php [L]
+    RewriteRule ^(.*)$ index.php/$1 [L]
 </IfModule>
