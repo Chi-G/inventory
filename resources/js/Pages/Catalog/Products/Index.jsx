@@ -189,7 +189,7 @@ export default function Index({ products, categories, suppliers, filters }) {
                                         </div>
                                     </td>
                                     <td className="px-6 py-5">
-                                        <div className="flex flex-col">
+                                        <div className="flex flex-col"> 
                                             {product.category?.parent && (
                                                 <span className="text-[10px] text-slate-400 uppercase font-bold mb-0.5">
                                                     {product.category.parent.name}
