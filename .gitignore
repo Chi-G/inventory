@@ -25,3 +25,9 @@ Homestead.yaml
 Thumbs.db
 PROJECT_TASKS.md
 PROJECT_GUIDE.md
+
+# AI Agent Clutter
+.claude/
+.gemini/
+.mcp.json
+scratch/

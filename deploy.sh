@@ -42,8 +42,6 @@ php artisan view:cache
 
 # 4. Storage
 echo "🔗 Ensuring storage link exists..."
-if [ ! -L public/storage ]; then
-    php artisan storage:link
-fi
+php artisan storage:link --force
 
 echo "✅ Post-Deployment Tasks Successful!"
