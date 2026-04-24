@@ -1,16 +1,16 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\BarcodeController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\BarcodeController;
-use App\Http\Controllers\StockMovementController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RolePermissionController;
+use App\Http\Controllers\StockMovementController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Storage;
 
 // This handles the root of the app (forahia.com/inventory/)
 Route::get('/', function () {
@@ -42,19 +42,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/permissions', [RolePermissionController::class, 'index'])->name('permissions.index');
         Route::post('/permissions', [RolePermissionController::class, 'update'])->name('permissions.update');
 
-        Route::get('/products/export', [ProductController::class, 'export'])->name('products.export'); 
+        Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
         Route::resource('products', ProductController::class);
-        
+
         Route::get('/logs/export', [StockMovementController::class, 'export'])->name('inventory.logs.export');
         Route::get('/logs', [StockMovementController::class, 'index'])->name('inventory.logs');
-        
+
         Route::post('/products/{product}/stock', [StockMovementController::class, 'store'])->name('products.stock');
         Route::get('/products/{product}/print', [ProductController::class, 'printBarcode'])->name('products.print');
         Route::get('/scan-center', [ProductController::class, 'scanCenter'])->name('scanner.index');
         Route::get('/api/lookup/{barcode}', [ProductController::class, 'apiLookup'])->name('api.products.lookup');
-        
+
         Route::resource('categories', CategoryController::class);
         Route::resource('suppliers', SupplierController::class);
         Route::get('/barcodes/{value}', [BarcodeController::class, 'generate'])->name('barcodes.generate');
     });
 });
+
+// Storage Fallback Route - Handles 404s when the symbolic link is broken on cloud environments
+Route::get('/storage/{path}', function ($path) {
+    if (! Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+
+    return Storage::disk('public')->response($path);
+})->where('path', '.*');
