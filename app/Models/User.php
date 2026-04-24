@@ -3,15 +3,17 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
+    use HasFactory, Notifiable;
+
     /**
      * Constants for timed access restrictions
      */
@@ -19,6 +21,7 @@ class User extends Authenticatable
      * Constants for timed access restrictions (loaded from .env)
      */
     const TIMED_ACCESS_HOURS = 1;      // Default if not in .env
+
     const LOCKOUT_HOURS = 12;         // Default if not in .env
 
     /**
@@ -101,8 +104,8 @@ class User extends Authenticatable
         parent::boot();
 
         static::creating(function ($user) {
-            if (!$user->uuid) {
-                $user->uuid = (string) \Illuminate\Support\Str::uuid();
+            if (! $user->uuid) {
+                $user->uuid = (string) Str::uuid();
             }
         });
     }
@@ -112,13 +115,13 @@ class User extends Authenticatable
      */
     public function getSlugAttribute()
     {
-        return \Illuminate\Support\Str::slug($this->role) . '-' . $this->uuid;
+        return Str::slug($this->role).'-'.$this->uuid;
     }
 
     /**
      * Get the user's role relationship
      */
-    public function role_relation(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function role_relation(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'role_id');
     }
@@ -128,8 +131,10 @@ class User extends Authenticatable
      */
     public function hasPermission(string $permissionName): bool
     {
-        if ($this->isSuperAdmin()) return true;
-        
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
         return $this->role_relation && $this->role_relation->permissions->contains('name', $permissionName);
     }
 }

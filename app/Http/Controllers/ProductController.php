@@ -7,8 +7,8 @@ use App\Models\Product;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class ProductController extends Controller
 {
@@ -42,17 +42,17 @@ class ProductController extends Controller
     public function create($slug = null)
     {
         $this->authorize('products.create');
-        
+
         return Inertia::render('Catalog/Products/Modify', [
             'categories' => Category::roots()->with('children')->get(),
-            'sku_suggestion' => 'ELV-' . strtoupper(Str::random(6)),
+            'sku_suggestion' => 'ELV-'.strtoupper(Str::random(6)),
         ]);
     }
 
     public function store(Request $request, $slug = null)
     {
         $this->authorize('products.create');
-        
+
         $validated = $request->validate([
             'sku' => 'required|string|unique:products,sku|max:50',
             'name' => 'required|string|max:255',
@@ -72,7 +72,7 @@ class ProductController extends Controller
 
         // Auto-generate barcode if blank
         if (empty($validated['barcode_value'])) {
-             $validated['barcode_value'] = $validated['sku'];
+            $validated['barcode_value'] = $validated['sku'];
         }
 
         Product::create($validated);
@@ -84,14 +84,14 @@ class ProductController extends Controller
     {
         return redirect()->route('products.edit', [
             'slug' => auth()->user()->slug,
-            'product' => $product->id
+            'product' => $product->id,
         ]);
     }
 
     public function edit(Product $product, $slug = null)
     {
         $this->authorize('products.edit');
-        
+
         return Inertia::render('Catalog/Products/Modify', [
             'product' => $product->load('category.parent'),
             'categories' => Category::roots()->with('children')->get(),
@@ -101,14 +101,14 @@ class ProductController extends Controller
     public function update(Request $request, Product $product, $slug = null)
     {
         $this->authorize('products.edit');
-        
+
         $validated = $request->validate([
-            'sku' => 'required|string|max:50|unique:products,sku,' . $product->id,
+            'sku' => 'required|string|max:50|unique:products,sku,'.$product->id,
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'barcode_value' => 'nullable|string|max:100|unique:products,barcode_value,' . $product->id,
+            'barcode_value' => 'nullable|string|max:100|unique:products,barcode_value,'.$product->id,
             'alert_threshold' => 'required|integer|min:0',
             'cost_price' => 'required|numeric|min:0',
             'retail_price' => 'required|numeric|min:0',
@@ -131,11 +131,11 @@ class ProductController extends Controller
     public function destroy(Product $product, $slug = null)
     {
         $this->authorize('products.delete');
-        
+
         if ($product->image_path) {
             Storage::disk('public')->delete($product->image_path);
         }
-        
+
         $product->delete();
 
         return redirect()->back()->with('success', 'Product removed from system.');
@@ -144,9 +144,9 @@ class ProductController extends Controller
     public function printBarcode(Product $product, $slug = null)
     {
         $this->authorize('products.barcode');
-        
+
         return Inertia::render('Catalog/Products/ProductSheet', [
-            'product' => $product
+            'product' => $product,
         ]);
     }
 
@@ -155,14 +155,26 @@ class ProductController extends Controller
         return Inertia::render('Catalog/Scanner/Index');
     }
 
-    public function apiLookup($barcode, $slug = null)
+    public function apiLookup($barcode)
     {
+        $idCandidate = $barcode;
+        if (str_contains($barcode, '-')) {
+            $idCandidate = explode('-', $barcode)[0];
+        }
+
         $product = Product::with(['category.parent'])
             ->where('barcode_value', $barcode)
             ->orWhere('sku', $barcode)
+            ->orWhere(function ($query) use ($barcode, $idCandidate) {
+                if (is_numeric($barcode)) {
+                    $query->where('id', $barcode);
+                } elseif (is_numeric($idCandidate)) {
+                    $query->where('id', $idCandidate);
+                }
+            })
             ->first();
 
-        if (!$product) {
+        if (! $product) {
             return response()->json(['message' => 'Product not found'], 404);
         }
 
@@ -177,17 +189,18 @@ class ProductController extends Controller
             'image_url' => $product->image_url,
             'current_stock' => $product->current_stock,
             'alert_threshold' => $product->alert_threshold,
-            'attributes' => $product->attributes
+            'attributes' => $product->attributes,
         ]);
     }
+
     public function export($slug = null)
     {
         $this->authorize('products.export');
-        
+
         $products = Product::with('category')->get();
         $csvHeader = ['SKU', 'Name', 'Category', 'Cost Price', 'Retail Price', 'Stock', 'Threshold'];
-        
-        $callback = function() use ($products, $csvHeader) {
+
+        $callback = function () use ($products, $csvHeader) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $csvHeader);
 
@@ -206,11 +219,11 @@ class ProductController extends Controller
         };
 
         return response()->stream($callback, 200, [
-            "Content-type" => "text/csv",
-            "Content-Disposition" => "attachment; filename=products_export_" . date('Y-m-d') . ".csv",
-            "Pragma" => "no-cache",
-            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-            "Expires" => "0"
+            'Content-type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename=products_export_'.date('Y-m-d').'.csv',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
         ]);
     }
 }

@@ -175,7 +175,7 @@ export default function ProductSheet({ product }) {
                         <img 
                             src={route('barcodes.generate', { value: product.barcode_value || product.sku, slug: auth.user.slug })} 
                             alt={product.barcode_value || product.sku}
-                            className="h-24 w-80 object-cover"
+                            className="h-24 w-80 object-contain bg-white"
                             style={{ imageRendering: 'crisp-edges' }}
                         />
                         <p className="font-mono text-sm tracking-[0.5em] mt-3 font-black uppercase opacity-60 text-center">{product.barcode_value}</p>

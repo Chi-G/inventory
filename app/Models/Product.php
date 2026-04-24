@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'sku',
         'name',
@@ -30,7 +33,7 @@ class Product extends Model
 
     protected $appends = ['image_url'];
 
-// Removed current_stock append to favor real DB column
+    // Removed current_stock append to favor real DB column
 
     public function category()
     {
@@ -47,7 +50,7 @@ class Product extends Model
     /**
      * Helper to perform a stock adjustment and generate a movement record.
      */
-    public function adjustStock(int $absoluteQuantity, string $type, string $notes = null, int $userId = null, int $supplierId = null)
+    public function adjustStock(int $absoluteQuantity, string $type, ?string $notes = null, ?int $userId = null, ?int $supplierId = null)
     {
         // Enforce quantity constraints based on type
         $quantity = match ($type) {
@@ -59,7 +62,7 @@ class Product extends Model
 
         // Prevent Stock-Outs that result in negative stock
         if ($type === 'OUT' && ($this->current_stock + $quantity < 0)) {
-            throw new \Exception("Insufficient stock to process this Stock-Out transaction.");
+            throw new \Exception('Insufficient stock to process this Stock-Out transaction.');
         }
 
         return $this->stockMovements()->create([
@@ -79,4 +82,3 @@ class Product extends Model
         return $this->image_path ? Storage::disk('public')->url($this->image_path) : null;
     }
 }
- 

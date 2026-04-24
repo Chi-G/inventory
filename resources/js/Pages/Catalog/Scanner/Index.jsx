@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import Modal from '@/Components/Modal';
@@ -12,6 +12,7 @@ import { Camera, Scan, Package, AlertCircle, CheckCircle2, ShoppingCart, Trash2 
 import axios from 'axios';
 
 export default function Index() {
+    const { auth } = usePage().props;
     const [scannedResult, setScannedResult] = useState(null);
     const [product, setProduct] = useState(null);
     const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
@@ -32,10 +33,19 @@ export default function Index() {
         let scanner = null;
         if (scanMode === 'camera') {
             scanner = new Html5QrcodeScanner('reader', {
-                fps: 10,
-                qrbox: { width: 250, height: 250 },
+                fps: 20, // Increased FPS for faster detection
+                qrbox: (viewfinderWidth, viewfinderHeight) => {
+                    // Wider box for 1D barcodes, square-ish for QR
+                    const width = viewfinderWidth * 0.8;
+                    const height = Math.min(viewfinderHeight * 0.4, 250);
+                    return { width, height };
+                },
                 rememberLastUsedCamera: true,
-                supportedScanTypes: [0]
+                aspectRatio: 1.0,
+                showTorchButtonIfSupported: true,
+                showZoomSliderIfSupported: true,
+                // Add explicit formats to prioritize
+                formatsToSupport: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 ], // Support all formats
             });
 
             scanner.render(onScanSuccess, (err) => {
@@ -46,7 +56,10 @@ export default function Index() {
         }
 
         if (scanMode === 'machine') {
-            machineInputRef.current?.focus();
+            const focusInput = () => machineInputRef.current?.focus();
+            focusInput();
+            window.addEventListener('click', focusInput);
+            return () => window.removeEventListener('click', focusInput);
         }
 
         return () => {
@@ -59,26 +72,34 @@ export default function Index() {
     // Handle machine (keyboard) scan
     const handleMachineScan = (e) => {
         if (e.key === 'Enter') {
-            const barcode = e.target.value.trim();
-            if (barcode) {
-                setScannedResult(barcode);
-                playBeep();
-                lookupProduct(barcode);
-                e.target.value = '';
-            }
+            triggerLookup(e.target.value);
+            e.target.value = '';
+        }
+    };
+
+    const triggerLookup = (barcode) => {
+        if (!barcode) return;
+        const cleaned = typeof barcode === 'string' ? barcode.trim() : String(barcode).trim();
+        if (cleaned) {
+            setScannedResult(cleaned);
+            playBeep();
+            lookupProduct(cleaned);
         }
     };
 
     const playBeep = () => {
-        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/766/766-preview.mp3');
-        audio.play().catch(e => console.log("Audio play blocked by browser."));
+        try {
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/766/766-preview.mp3');
+            audio.volume = 0.5;
+            audio.play().catch(e => console.warn("Audio play blocked by browser action. Interact with the page first."));
+        } catch (e) {
+            console.error("Audio beep error:", e);
+        }
     };
 
     function onScanSuccess(decodedText, decodedResult) {
         if (decodedText !== scannedResult) {
-            setScannedResult(decodedText);
-            playBeep();
-            lookupProduct(decodedText);
+            triggerLookup(decodedText);
         }
     }
 
@@ -92,7 +113,10 @@ export default function Index() {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await axios.get(route('api.products.lookup', barcode));
+            const response = await axios.get(route('api.products.lookup', { 
+                slug: auth.user.slug, 
+                barcode: barcode 
+            }));
             setProduct(response.data);
             setIsAdjustModalOpen(true);
         } catch (err) {
@@ -105,7 +129,10 @@ export default function Index() {
 
     const handleAdjustment = (e) => {
         e.preventDefault();
-        router.post(route('products.stock', product.id), formData, {
+        router.post(route('products.stock', { 
+            slug: auth.user.slug, 
+            product: product.id 
+        }), formData, {
             onSuccess: () => {
                 setIsAdjustModalOpen(false);
                 setScannedResult(null);
@@ -165,15 +192,25 @@ export default function Index() {
                                 <h3 className="text-xl font-bold text-slate-800">Machine Mode Active</h3>
                                 <p className="text-slate-500 mt-2 mb-8 max-w-xs text-center">Your QR Scanner machine is ready. Point it at a barcode and pull the trigger.</p>
                                 
-                                <div className="w-full max-w-md relative">
-                                    <TextInput 
-                                        ref={machineInputRef}
-                                        onKeyDown={handleMachineScan}
-                                        placeholder="Waiting for hardware scan..."
-                                        className="w-full h-16 px-6 text-xl font-bold border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500 text-center rounded-2xl shadow-sm"
-                                    />
-                                    <div className="absolute inset-y-0 right-4 flex items-center">
-                                        <div className="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></div>
+                                <div className="w-full max-w-md space-y-4">
+                                    <div className="relative">
+                                        <TextInput 
+                                            ref={machineInputRef}
+                                            onKeyDown={handleMachineScan}
+                                            placeholder="Waiting for hardware scan..."
+                                            className="w-full h-16 px-6 text-xl font-bold border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500 text-center rounded-2xl shadow-sm"
+                                        />
+                                        <div className="absolute inset-y-0 right-4 flex items-center">
+                                            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></div>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-center">
+                                        <SecondaryButton 
+                                            onClick={() => triggerLookup(machineInputRef.current.input.value)}
+                                            className="px-8 h-12 bg-white text-indigo-600 border-indigo-100 hover:bg-indigo-50"
+                                        >
+                                            Lookup Manually
+                                        </SecondaryButton>
                                     </div>
                                 </div>
                             </div>
@@ -219,7 +256,10 @@ export default function Index() {
             </div>
 
             {/* Quick Adjust Modal */}
-            <Modal show={isAdjustModalOpen} onClose={() => setIsAdjustModalOpen(false)}>
+            <Modal show={isAdjustModalOpen} onClose={() => {
+                setIsAdjustModalOpen(false);
+                setScannedResult(null);
+            }}>
                 {product && (
                     <div className="p-0 overflow-hidden">
                         <div className="p-8 bg-indigo-600 text-white relative">
