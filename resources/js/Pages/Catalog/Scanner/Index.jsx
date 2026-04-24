@@ -45,7 +45,7 @@ export default function Index() {
                 showTorchButtonIfSupported: true,
                 showZoomSliderIfSupported: true,
                 // Add explicit formats to prioritize
-                formatsToSupport: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 ], // Support all formats
+                formatsToSupport: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
             });
 
             scanner.render(onScanSuccess, (err) => {
@@ -106,16 +106,16 @@ export default function Index() {
     function onScanFailure(error) {
         // quiet fail
         // now how will it fail? is there no code to be written here?
-        
+
     }
 
     const lookupProduct = async (barcode) => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await axios.get(route('api.products.lookup', { 
-                slug: auth.user.slug, 
-                barcode: barcode 
+            const response = await axios.get(route('api.products.lookup', {
+                slug: auth.user.slug,
+                barcode: barcode
             }));
             setProduct(response.data);
             setIsAdjustModalOpen(true);
@@ -129,9 +129,9 @@ export default function Index() {
 
     const handleAdjustment = (e) => {
         e.preventDefault();
-        router.post(route('products.stock', { 
-            slug: auth.user.slug, 
-            product: product.id 
+        router.post(route('products.stock', {
+            slug: auth.user.slug,
+            product: product.id
         }), formData, {
             onSuccess: () => {
                 setIsAdjustModalOpen(false);
@@ -158,14 +158,14 @@ export default function Index() {
                             <p className="text-slate-400 mt-1 text-sm">Select your scanning preference below.</p>
                         </div>
                         <div className="flex bg-slate-800 p-1.5 rounded-xl border border-slate-700 w-full md:w-auto">
-                            <button 
+                            <button
                                 onClick={() => setScanMode('camera')}
                                 className={`flex-1 md:flex-none px-4 py-3 md:py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${scanMode === 'camera' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
                             >
                                 <Camera className="w-3 h-3" />
                                 Camera
                             </button>
-                            <button 
+                            <button
                                 onClick={() => setScanMode('machine')}
                                 className={`flex-1 md:flex-none px-4 py-3 md:py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${scanMode === 'machine' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
                             >
@@ -191,10 +191,10 @@ export default function Index() {
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-800">Machine Mode Active</h3>
                                 <p className="text-slate-500 mt-2 mb-8 max-w-xs text-center">Your QR Scanner machine is ready. Point it at a barcode and pull the trigger.</p>
-                                
+
                                 <div className="w-full max-w-md space-y-4">
                                     <div className="relative">
-                                        <TextInput 
+                                        <TextInput
                                             ref={machineInputRef}
                                             onKeyDown={handleMachineScan}
                                             placeholder="Waiting for hardware scan..."
@@ -205,7 +205,7 @@ export default function Index() {
                                         </div>
                                     </div>
                                     <div className="flex justify-center">
-                                        <SecondaryButton 
+                                        <SecondaryButton
                                             onClick={() => triggerLookup(machineInputRef.current.input.value)}
                                             className="px-8 h-12 bg-white text-indigo-600 border-indigo-100 hover:bg-indigo-50"
                                         >

@@ -67,7 +67,7 @@ class ProductController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image_path'] = $request->file('image')->store('products', 'public');
+            $validated['image_path'] = $request->file('image')->store('products');
         }
 
         // Auto-generate barcode if blank
@@ -118,9 +118,9 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image
             if ($product->image_path) {
-                Storage::disk('public')->delete($product->image_path);
+                Storage::delete($product->image_path);
             }
-            $validated['image_path'] = $request->file('image')->store('products', 'public');
+            $validated['image_path'] = $request->file('image')->store('products');
         }
 
         $product->update($validated);
@@ -133,7 +133,7 @@ class ProductController extends Controller
         $this->authorize('products.delete');
 
         if ($product->image_path) {
-            Storage::disk('public')->delete($product->image_path);
+            Storage::delete($product->image_path);
         }
 
         $product->delete();

@@ -85,7 +85,7 @@ The application is pre-configured for deployment in subdirectories (specifically
    sh deploy.sh
    ```
 
-*Live Demo:* [https://elevate-interiors-main-u9gujh.laravel.cloud](https://elevate-interiors-main-u9gujh.laravel.cloud)
+*Live Demo:* [https://elevate-interiors.laravel.cloud](https://elevate-interiors.laravel.cloud)
 
 ## Environment Configuration
 The application is environment-aware and supports both root-domain (Laravel Cloud) and subdirectory (Hostinger) deployments. Use the `APP_URL` and `ASSET_URL` environment variables to configure your specific instance.
