@@ -272,8 +272,16 @@ export default function Index() {
                                     </div>
                                 )}
                                 <div className="min-w-0">
-                                    <p className="text-xs font-bold uppercase tracking-widest text-indigo-200">{product.sku}</p>
-                                    <h3 className="text-xl font-bold truncate">{product.name}</h3>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-200">{product.sku}</p>
+                                        {product.category && (
+                                            <span className="text-[10px] font-bold uppercase px-2 py-0.5 bg-white/10 rounded-full border border-white/10 text-white truncate max-w-[100px]">
+                                                {product.category.name}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <h3 className="text-xl font-bold truncate leading-tight">{product.name}</h3>
+                                    <p className="text-sm font-medium text-indigo-100/80 mt-0.5 capitalize">Retail: {new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(product.retail_price)}</p>
                                 </div>
                             </div>
                             <div className="absolute top-8 right-8">
