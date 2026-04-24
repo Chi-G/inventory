@@ -9,8 +9,31 @@ use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\TimedAccessMiddleware;
+use Illuminate\Session\Middleware\AuthenticateSession;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+
+/**
+ * Storage Asset Proxy Route (CRITICAL FOR CLOUD)
+ * We place this at the TOP to ensure it's handled BEFORE any catch-all slug routes or auth redirects.
+ * It bypasses Nginx /storage/ blockages and broken symlinks.
+ */
+Route::get('/_asset-proxy/{path}', function ($path) {
+    $disk = Storage::disk('public');
+    if (! $disk->exists($path)) {
+        Log::warning('Storage Proxy: File not found: '.$path);
+        abort(404);
+    }
+
+    return $disk->response($path);
+})->where('path', '.*')->withoutMiddleware([
+    TimedAccessMiddleware::class,
+    HandleInertiaRequests::class,
+    AuthenticateSession::class,
+]);
 
 // This handles the root of the app (forahia.com/inventory/)
 Route::get('/', function () {
@@ -20,6 +43,7 @@ Route::get('/', function () {
 Route::post('/', function () {
     return redirect()->route('login');
 });
+
 // Standard Auth Routes (Login, etc.)
 require __DIR__.'/auth.php';
 
@@ -58,16 +82,3 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/barcodes/{value}', [BarcodeController::class, 'generate'])->name('barcodes.generate');
     });
 });
-
-/**
- * Storage Asset Proxy Route
- * This bypasses potential Nginx /storage/ blockages and broken symlinks on cloud environments.
- * It serves files directly from the public disk if they are requested via /app-assets/ or /storage/
- */
-Route::get('{prefix}/{path}', function ($prefix, $path) {
-    if (! Storage::disk('public')->exists($path)) {
-        abort(404);
-    }
-
-    return Storage::disk('public')->response($path);
-})->where('prefix', '(app-assets|storage)')->where('path', '.*');

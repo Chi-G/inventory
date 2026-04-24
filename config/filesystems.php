@@ -41,7 +41,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/app-assets',
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/_asset-proxy',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
