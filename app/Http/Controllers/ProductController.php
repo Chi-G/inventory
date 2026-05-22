@@ -58,7 +58,7 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'barcode_value' => 'nullable|string|unique:products,barcode_value|max:100',
             'alert_threshold' => 'required|integer|min:0',
             'cost_price' => 'required|numeric|min:0',
@@ -67,7 +67,7 @@ class ProductController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image_path'] = $request->file('image')->store('products');
+            $validated['image_path'] = $request->file('image')->store('products', 'public');
         }
 
         // Auto-generate barcode if blank
@@ -120,7 +120,7 @@ class ProductController extends Controller
             if ($product->image_path) {
                 Storage::delete($product->image_path);
             }
-            $validated['image_path'] = $request->file('image')->store('products');
+            $validated['image_path'] = $request->file('image')->store('products', 'public');
         }
 
         $product->update($validated);
